@@ -1,7 +1,7 @@
-import { Pane, Heading } from 'evergreen-ui'
+import { Heading } from 'evergreen-ui'
 import Center from 'components/CenterPage'
 
-export default () => (
+const Home = () => (
   <Center>
     <Heading
       size={900}
@@ -13,3 +13,7 @@ export default () => (
     </Heading>
   </Center>
 )
+
+Home.displayName = 'Home'
+
+export default Home

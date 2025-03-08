@@ -5,14 +5,13 @@ import {
   Pane,
   majorScale,
   toaster,
-  TextInput,
-  minorScale
+  TextInput
 } from 'evergreen-ui'
 import { trpc } from 'lib/trpc'
 import Center from 'components/CenterPage'
 import ToDoItem from 'views/ToDo/ToDoItem'
 
-export default () => {
+const ToDo = () => {
   const [newTodo, setNewTodo] = useState('')
   const utils = trpc.useUtils()
   const invalidateTodos = utils.todo.list.invalidate
@@ -110,3 +109,7 @@ export default () => {
     </Center>
   )
 }
+
+ToDo.displayName = 'ToDo'
+
+export default ToDo

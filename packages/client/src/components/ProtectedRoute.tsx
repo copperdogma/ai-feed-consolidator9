@@ -6,7 +6,7 @@ import { Spinner } from 'evergreen-ui'
 
 interface ProtectedRouteProps {
   element: React.ComponentType
-  [key: string]: any
+  [key: string]: unknown
 }
 
 const ProtectedRoute = ({
@@ -17,16 +17,13 @@ const ProtectedRoute = ({
   const {
     data: user,
     isLoading,
-    isError,
-    refetch
+    isError
   } = trpc.auth.getUser.useQuery(undefined, {
     retry: false,
     onError: () => {
       queryClient.setQueryData(['auth', 'user'], null)
     }
   })
-
-  console.log('user', user)
 
   if (isLoading || user === undefined) {
     return <Spinner>Loading...</Spinner>
@@ -38,5 +35,7 @@ const ProtectedRoute = ({
 
   return <Component {...rest} />
 }
+
+ProtectedRoute.displayName = 'ProtectedRoute'
 
 export default ProtectedRoute

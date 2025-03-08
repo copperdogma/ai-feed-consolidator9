@@ -2,7 +2,7 @@ import { Pane, majorScale } from 'evergreen-ui'
 import NavBar from 'views/Login/Auth/NavBar'
 import TechStack from 'views/Login/TechStack'
 
-export default () => (
+const Login = () => (
   <Pane width="100%" height="100%" maxHeight={majorScale(200)}>
     <NavBar />
     <Pane
@@ -18,3 +18,7 @@ export default () => (
     </Pane>
   </Pane>
 )
+
+Login.displayName = 'Login'
+
+export default Login

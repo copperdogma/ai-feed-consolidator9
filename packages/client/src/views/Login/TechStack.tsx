@@ -25,7 +25,7 @@ const logos: { src: string; name: string; site: string }[] = [
   { src: dockerLogo, name: 'Docker', site: 'https://www.docker.com/' }
 ]
 
-export default () => (
+const TechStack = () => (
   <Pane
     display="flex"
     flexDirection="column"
@@ -59,3 +59,7 @@ export default () => (
     ))}
   </Pane>
 )
+
+TechStack.displayName = 'TechStack'
+
+export default TechStack

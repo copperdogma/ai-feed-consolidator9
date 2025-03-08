@@ -8,7 +8,7 @@ import AboutSideSheet from 'views/Login/AboutSideSheet'
 import Center from 'components/CenterPage'
 import { useNavigate } from 'react-router-dom'
 
-export default () => {
+const NavBar = () => {
   const { data: user, isLoading } = trpc.auth.getUser.useQuery()
   const navigate = useNavigate()
   const [signInIsOpen, setSignInIsOpen] = useState(false)
@@ -83,3 +83,7 @@ export default () => {
     </Pane>
   )
 }
+
+NavBar.displayName = 'NavBar'
+
+export default NavBar

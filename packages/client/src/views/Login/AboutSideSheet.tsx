@@ -11,8 +11,7 @@ import {
   UnorderedList,
   ListItem,
   Elevation,
-  Text,
-  Li
+  Text
 } from 'evergreen-ui'
 
 import linkedIn from 'views/Login/assets/linkedin-logo.png'
@@ -31,7 +30,7 @@ const cardProps = {
   padding: majorScale(2)
 }
 
-export default ({ isShown, setIsShown }: Props) => (
+const AboutSideSheet = ({ isShown, setIsShown }: Props) => (
   <SideSheet
     isShown={isShown}
     onCloseComplete={() => setIsShown(false)}
@@ -173,3 +172,7 @@ export default ({ isShown, setIsShown }: Props) => (
     </Pane>
   </SideSheet>
 )
+
+AboutSideSheet.displayName = 'AboutSideSheet'
+
+export default AboutSideSheet

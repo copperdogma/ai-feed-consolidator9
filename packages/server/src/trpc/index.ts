@@ -1,28 +1,24 @@
+import { TRPCError, initTRPC } from '@trpc/server'
 import { Context } from 'lib/context'
-import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 
-const trpc = initTRPC.context<Context>().create({
+const t = initTRPC.context<Context>().create({
   transformer: superjson,
-  errorFormatter({ shape, error, ctx }) {
-    if (error.code === 'INTERNAL_SERVER_ERROR') {
-      console.error('Internal Server Error:', error)
-      return { ...shape, message: 'Internal Server Error' }
-    }
-    return shape
-  }
+  errorFormatter: ({ shape }) => shape
 })
 
-const isAuthenticated = trpc.middleware(({ next, ctx }) => {
+export const router = t.router
+export const middleware = t.middleware
+export const publicProcedure = t.procedure
+
+export const protectedProcedure = t.procedure.use(({ next, ctx }) => {
   if (!ctx.user) {
-    throw new TRPCError({ message: 'Unauthorized', code: 'UNAUTHORIZED' })
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'You need to be logged in to access this resource'
+    })
   }
   return next({
     ctx: { user: ctx.user }
   })
 })
-
-export const router = trpc.router
-export const protectedProcedure = trpc.procedure.use(isAuthenticated)
-export const publicProcedure = trpc.procedure
-export default trpc

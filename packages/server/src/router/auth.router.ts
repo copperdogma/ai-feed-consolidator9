@@ -1,4 +1,4 @@
-import { publicProcedure, protectedProcedure, router } from 'trpc'
+import { publicProcedure, router } from 'trpc'
 import { userCredentialsSchema } from 'types/auth.dtos'
 import userModel from 'trpc/models/user.model'
 

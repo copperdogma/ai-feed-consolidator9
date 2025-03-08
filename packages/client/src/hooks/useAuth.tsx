@@ -64,8 +64,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setError(null);
       const result = await signInWithEmailAndPassword(auth, email, password);
       return result.user;
-    } catch (error: any) {
-      setError(error.message || 'Failed to sign in');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign in';
+      setError(errorMessage);
       throw error;
     }
   };
@@ -76,8 +77,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setError(null);
       const result = await createUserWithEmailAndPassword(auth, email, password);
       return result.user;
-    } catch (error: any) {
-      setError(error.message || 'Failed to sign up');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign up';
+      setError(errorMessage);
       throw error;
     }
   };
@@ -89,8 +91,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       return result.user;
-    } catch (error: any) {
-      setError(error.message || 'Failed to sign in with Google');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign in with Google';
+      setError(errorMessage);
       throw error;
     }
   };
@@ -101,8 +104,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await signOut(auth);
       // Invalidate user query data after logout
       await utils.auth.getUser.invalidate();
-    } catch (error: any) {
-      setError(error.message || 'Failed to log out');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to log out';
+      setError(errorMessage);
       throw error;
     }
   };

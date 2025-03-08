@@ -1,7 +1,7 @@
 import { Button } from 'evergreen-ui'
 import { trpc } from 'lib/trpc'
 
-export default () => {
+const LogoutButton = () => {
   const utils = trpc.useUtils()
   const logout = trpc.auth.logout.useMutation({
     onSuccess: () => utils.auth.getUser.invalidate()
@@ -13,3 +13,7 @@ export default () => {
     </Button>
   )
 }
+
+LogoutButton.displayName = 'LogoutButton'
+
+export default LogoutButton

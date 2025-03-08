@@ -1,23 +1,24 @@
 import prisma from 'sdks/prisma'
-import trpc from 'trpc'
-import { protectedProcedure } from 'trpc'
-import { z } from 'zod'
-import { TodoCreateInputSchema } from 'generated/zod'
+import { protectedProcedure, router } from 'trpc'
+import * as z from 'zod'
 
-export const todoRouter = trpc.router({
-  list: protectedProcedure.query(() => prisma.todo.findMany({
-    orderBy: {
-      updatedAt: 'asc'
-    }
-  })),
+export const todoRouter = router({
+  list: protectedProcedure.query(async () => {
+    return await prisma.todo.findMany({
+      orderBy: { updatedAt: 'desc' }
+    })
+  }),
   create: protectedProcedure
-    .input(z.object({ title: z.string() }))
-    .mutation(({ input }) => {
-      const title = input.title
-      return prisma.todo.create({
+    .input(
+      z.object({
+        title: z.string().min(1)
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Create a new todo
+      return await prisma.todo.create({
         data: {
-          title,
-          isCompleted: false
+          title: input.title
         }
       })
     }),
@@ -31,15 +32,20 @@ export const todoRouter = trpc.router({
       })
     }),
   update: protectedProcedure
-    .input(z.object({ id: z.string(), isCompleted: z.boolean() }))
-    .mutation(({ ctx, input }) => {
-      return prisma.todo.update({
-        where: {
-          id: input.id
-        },
-        data: {
-          isCompleted: input.isCompleted
-        }
+    .input(
+      z.object({
+        id: z.string(),
+        data: z.object({
+          title: z.string().min(1).optional(),
+          isCompleted: z.boolean().optional()
+        })
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Update a todo
+      return await prisma.todo.update({
+        where: { id: input.id },
+        data: input.data
       })
     })
 })

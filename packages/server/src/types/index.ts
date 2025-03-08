@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { DynamicQueryExtensionCbArgs, InternalArgs, DefaultArgs, DynamicModelExtensionArgs } from '@prisma/client/runtime/library'
+import { DynamicQueryExtensionCbArgs, InternalArgs, DefaultArgs } from '@prisma/client/runtime/library'
 
 type PrismaSchema = Prisma.TypeMap<InternalArgs & DefaultArgs>
 type Entities = PrismaSchema['model']
@@ -36,3 +36,5 @@ export type QueryExtParams<
 export type QueryExtensionParamsByEntity<E extends keyof Entities> = {
   [K in EntityOperations<E>]: QueryExtParams<E, K>
 }
+
+// Add any global types here
