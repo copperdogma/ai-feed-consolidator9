@@ -1,0 +1,198 @@
+# Scratchpad - Project Setup Phase
+
+**Current Phase**: Project Setup
+
+**NOTES**
+- Do NOT start building the actual app. That's done in the next phase.
+- Update this checklist after every step
+
+**Tasks**  
+- [x] Read `/docs/architecture.md` to understand the technical requirements but don't act yet.
+- [x] Read `/bootstrapping/project-types/programming/project-setup/starter-repos.md` to get the curated list URLs.
+- [x] Visit ONLY the URLs provided in the starter-repos.md file as starting points.
+- [x] For each URL in starter-repos.md:
+   - [x] Navigate to relevant sections that match the project requirements.
+   - [x] Document the navigation path through the curated list.
+   - [x] Identify potential repositories that match the architecture requirements.
+- [x] Ensure you've explored all URLs in starter-repos.md before proceeding.
+- [x] For each identified repository, document:
+   - [x] Source URL (must be from the lists in starter-repos.md)
+   - [x] Path through curated lists
+   - [x] Features that match requirements
+   - [x] Missing features
+   - [x] Compatibility score (1-10)
+- [x] Present the top 3 repositories to the user with detailed analysis.
+- [x] If unable to find 3 suitable repositories from the URLs in starter-repos.md, report specific difficulties and request permission for broader web searches.
+- [x] Make a checklist in this document of what steps are needed to either a) pull and configure the chosen starter repo, or b) install and configure the chosen custom architecture.
+- [x] If you pulled a starter repo, check its README file for a project overview and add the setup steps you find there to this checklist.
+- [ ] Configure development tools (e.g., ESLint, Prettier)  
+- [ ] Set up version control (e.g., git init)
+- [x] Erase and rewrite the README.md file so it's perfect for this newly set up project
+- [x] Document the new project structure in `/docs/design.md`
+- [ ] Double check all steps are complete before moving on to the next phase
+
+**Identified Repositories**
+
+1. **jason-greenberg/trpc-express-prisma-react-vite-docker-starter** ✅ SELECTED
+   - **Source URL**: https://github.com/jason-greenberg/trpc-express-prisma-react-vite-docker-starter
+   - **Path**: From GitHub Awesome Lists > Searched for repositories matching React, TypeScript, Prisma, Docker requirements
+   - **Features that match requirements**:
+     - React with TypeScript
+     - Prisma ORM for database access
+     - Docker containerization (Docker Compose)
+     - Authentication system (JWT) which could be adapted for Firebase
+     - Vite for fast development
+     - Example CRUD functionality
+   - **Missing features**:
+     - Uses tRPC instead of Express REST API directly
+     - No Firebase integration (uses JWT directly)
+     - No OpenAI integration
+   - **Compatibility score**: 8/10 (increased from 7/10 since Material-UI is no longer a requirement)
+   - **Notes**: 
+     - User confirmed Material-UI is not a required component
+     - Will need to adapt tRPC to REST API or use tRPC directly
+     - Will need to integrate Firebase Authentication
+     - Will need to add OpenAI integration
+
+2. **rokasta12/typescript-nodejs-starter**
+   - **Source URL**: https://github.com/rokasta12/typescript-nodejs-starter
+   - **Path**: From GitHub Awesome Lists > Searched for repositories matching React, TypeScript, Prisma requirements
+   - **Features that match requirements**:
+     - Node.js with TypeScript
+     - Express.js for building web applications
+     - Prisma as an ORM
+     - Docker Compose configuration for PostgreSQL
+     - Zod for request validation (similar functionality to our validation needs)
+   - **Missing features**:
+     - No frontend implementation (React missing)
+     - No Firebase authentication
+     - No OpenAI integration
+   - **Compatibility score**: 6/10
+
+3. **mattburrell/vite-react-docker**
+   - **Source URL**: https://github.com/mattburrell/vite-react-docker
+   - **Path**: From GitHub Awesome Lists > Searched for repositories with React, Vite, and Docker
+   - **Features that match requirements**:
+     - React with TypeScript
+     - Vite for fast development
+     - Docker containerization
+     - NGINX for serving static content
+   - **Missing features**:
+     - No backend implementation
+     - No Prisma ORM
+     - No Firebase authentication
+     - No OpenAI integration
+   - **Compatibility score**: 5/10
+
+**User Input**  
+- User provided a comprehensive specification for the AI Feed Consolidator application
+- User confirmed they want to use the programming project type
+- User wants to create the project from scratch using the bootstrapping technique
+- User requested to use Firebase for authentication
+- User confirmed Material-UI is not a required component
+
+**Decisions Made**
+- Selected jason-greenberg/trpc-express-prisma-react-vite-docker-starter as our starter template
+- Updated documentation to reflect that Material-UI is no longer a requirement
+- Will adapt the tRPC implementation to REST API or use tRPC directly
+- Will integrate Firebase Authentication to replace JWT
+- Will add OpenAI API integration
+- Will use local PostgreSQL database instead of containerized PostgreSQL
+- Upgraded Prisma from v5 to v6
+
+**Quick Start Assumptions**  
+- Using React with TypeScript for frontend
+- Using Node.js with Express for backend
+- Using PostgreSQL running locally on the host machine (not in Docker)
+- Using Docker for containerization of server and client components only
+- Using OpenAI API for content summarization
+- Using Firebase Authentication for user management and authentication
+
+**Issues or Blockers**  
+- Docker container setup needs adjustment for Firebase integration
+- Need to fix Docker containers to properly include Firebase Admin SDK
+
+**Progress Update**
+- [x] Cloned the repository as ai-feed-consolidator
+- [x] Moved all files from ai-feed-consolidator directory to the parent directory for better organization
+- [x] Created .env file from .env.example template
+- [x] Updated .env with our project settings and placeholders for Firebase and OpenAI
+- [x] Updated package.json with our project details and changed scripts to use npm instead of yarn
+- [x] Created a comprehensive new README.md for the AI Feed Consolidator project
+- [x] Reviewed server code structure
+- [x] Reviewed client code structure
+- [x] Identified authentication system components for Firebase integration
+- [x] Created Firebase configuration files for both client and server
+- [x] Updated Prisma schema to include Firebase UID field
+- [x] Created a custom Firebase authentication hook for the client
+- [x] Updated server context to verify Firebase tokens
+- [x] Upgraded Prisma from v5 to v6 for better performance and features
+- [ ] Identified where to add OpenAI integration (not started)
+- [x] Examined Docker configuration
+
+**Setup Checklist for jason-greenberg/trpc-express-prisma-react-vite-docker-starter**
+
+- [x] Clone the repository:
+  ```bash
+  git clone https://github.com/jason-greenberg/trpc-express-prisma-react-vite-docker-starter.git ai-feed-consolidator
+  ```
+- [x] Navigate to the project directory:
+  ```bash
+  cd ai-feed-consolidator
+  ```
+- [x] Copy the `.env.example` file to `.env` and update with our environment variables:
+  - [x] Set database credentials
+  - [x] Add placeholders for Firebase authentication settings
+  - [x] Add placeholders for OpenAI API key
+- [x] Update Docker configuration to use local PostgreSQL:
+  - [x] Remove PostgreSQL container from docker-compose.yaml
+  - [x] Update database connection string to point to host machine
+  - [x] Configure networking for Docker-to-host communication
+- [x] Set up local PostgreSQL: (PostgreSQL is already installed locally)
+  - [x] Create the ai_feed_consolidator database
+  - [x] Configure PostgreSQL to listen on port 5432 (using default port)
+  - [x] Set up a database user with appropriate permissions
+- [x] Build and start the containers:
+  ```bash
+  npm run develop
+  ```
+- [x] Verify the application is running at `http://localhost:5173`
+- [x] Verify successful connection to local PostgreSQL database
+- [x] Review and understand the project structure
+- [ ] Identify areas for adapting tRPC to REST API (if needed)
+- [x] Identify where to replace JWT authentication with Firebase
+- [x] Set up Firebase Authentication:
+  - [x] Install Firebase SDK for client
+  - [x] Install Firebase Admin SDK for server
+  - [x] Create Firebase configuration for client
+  - [x] Create Firebase Admin configuration for server
+  - [x] Update Prisma schema to include Firebase UID field
+  - [x] Create custom authentication hooks for client
+  - [x] Update server context to verify Firebase tokens
+  - [ ] Fix Docker container configuration to include Firebase dependencies
+- [x] Upgrade Prisma to v6:
+  - [x] Update Prisma packages
+  - [x] Regenerate Prisma client
+  - [x] Verify database schema and connections
+- [ ] Identify where to add OpenAI API integration
+- [ ] Plan for adding platform-specific adapters (YouTube, X, RSS, Email)
+- [ ] Run database migrations if needed:
+  ```bash
+  npm run prisma:migrate:dev
+  ```
+- [x] Update project name and details in package.json
+- [x] Create a comprehensive README.md specific to our AI Feed Consolidator project
+- [x] Document updated project structure in `/docs/design.md`
+
+**Additional Tasks Specific to Our Project**
+- [ ] Add OpenAI API client and integration
+- [x] Set up Firebase Authentication (client and server configuration complete)
+- [ ] Complete Firebase Authentication UI components
+- [ ] Implement platform-specific adapters for content sources
+- [ ] Implement content summarization and topic detection features
+- [ ] Create basic UI components for feed display and filtering
+- [ ] Configure Docker for both local and fly.io deployment
+
+**Transition to Next Phase**
+- Once all tasks are checked off, ask: "Are you ready to move to the Work phase?"
+- To move to the next phase, run `./bootstrapping/scripts/transition_to_execute.sh programming work`

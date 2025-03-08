@@ -1,0 +1,21 @@
+FROM node:20
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+# Set the target platform and OpenSSL version
+ENV PRISMA_CLI_BINARY_TARGETS=linux-arm64-openssl-3.0.x
+
+# Generate Prisma Client using npx
+RUN npx prisma generate
+
+EXPOSE 3001
+
+CMD if [ "$ENVIRONMENT" = "development" ]; then \
+      npx prisma migrate deploy; \
+    fi \
+    && npx tsx watch --clear-screen=false ./src/main.ts

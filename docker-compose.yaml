@@ -1,0 +1,47 @@
+version: '3'
+services:
+  server:
+    container_name: server
+    build:
+      context: ./packages/server
+      dockerfile: Dockerfile.server
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - HOST=${HOST}
+      - SERVER_PORT=${SERVER_PORT}
+    env_file:
+      - .env
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./packages/server:/app
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${HOST}:${SERVER_PORT}/healthcheck"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Use host network mode on Linux to access local PostgreSQL
+    # On macOS and Windows, use 'host.docker.internal' in DATABASE_URL instead
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  client:
+    container_name: client
+    build:
+      context: ./packages/client
+      dockerfile: Dockerfile.client
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - VITE_CLIENT_PORT=${VITE_CLIENT_PORT}
+    env_file:
+      - .env
+    ports:
+      - '${VITE_CLIENT_PORT}:${VITE_CLIENT_PORT}'
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./.env:/app/.env
