@@ -10,8 +10,9 @@ AI Feed Consolidator Application
 | Story ID | Title                                   | Priority | Status    | Link                                                   |
 |----------|----------------------------------------|----------|-----------|--------------------------------------------------------|
 | 001      | Project Setup and Infrastructure        | High     | Done      | /docs/stories/story-001-project-setup-infrastructure.md |
-| 001.1    | Firebase Authentication Implementation  | High     | Partially Complete | /docs/stories/story-001.1-firebase-authentication-implementation.md |
+| 001.1    | Firebase Authentication Implementation  | High     | Done      | /docs/stories/story-001.1-firebase-authentication-implementation.md |
 | 002      | Local PostgreSQL and Schema Implementation | High     | To Do     | /docs/stories/story-002-local-database-setup.md |
+| 002.1    | User Profile Management                 | High     | To Do     | /docs/stories/story-002.1-user-profile-management.md |
 | 003      | RSS Feed Integration                    | High     | To Do     | /docs/stories/story-003-rss-feed-integration.md         |
 | 004      | YouTube Integration                     | High     | To Do     | /docs/stories/story-004-youtube-integration.md          |
 | 005      | X/Twitter Integration                   | High     | To Do     | /docs/stories/story-005-twitter-integration.md          |
@@ -32,4 +33,5 @@ AI Feed Consolidator Application
 - Medium priority stories represent important but not critical functionality
 - Stories may be broken down further during implementation
 - Additional stories may be added as the project progresses
-- Story 001.1 has the core authentication implemented but user profile management may be completed as part of Story 002
+- Story 001.1 (Firebase Authentication) has been completed with core authentication implemented
+- User profile management tasks have been moved to Story 002.1, which depends on Story 002 (database schema)

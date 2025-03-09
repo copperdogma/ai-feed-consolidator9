@@ -8,58 +8,33 @@ Suggested headings: Current Story, Current Task, Plan Checklist, Issues/Blockers
 
 
 ## Current Story
-**Story 001.1: Firebase Authentication Implementation**
-
-This story involves implementing real authentication functionality using the Firebase project that has been created.
+Story 001.1 (Firebase Authentication Implementation) has been completed, and we're ready to move on to Story 002 (Local PostgreSQL and Schema Implementation).
 
 ## Current Task
-Decide whether to complete the user profile management portion of Story 001.1 or consider the authentication portion complete and move on to Story 002.
+Prepare for work on Story 002 (Local PostgreSQL and Schema Implementation).
 
-## Plan Checklist
-- [x] Create a new Firebase project in the Firebase console
-- [x] Configure authentication methods
-- [x] Update environment variables
-- [x] Simplify authentication UI to use only Google Sign-in
-- [x] Test authentication flow
-- [ ] Implement user profile management:
-  - [ ] Create/update user records in database when users authenticate
-  - [ ] Store additional user information (name, profile picture, etc.)
-  - [ ] Implement profile editing functionality
-- [ ] Enhance error handling
-- [ ] Secure routes and API endpoints
-- [ ] Documentation
+## Recently Completed Tasks
+- [x] Split Story 001.1 to separate authentication from user profile management
+- [x] Created new Story 002.1 for User Profile Management
+- [x] Marked Story 001.1 as "Done" instead of "Partially Complete"
+- [x] Updated the stories.md index to reflect these changes
+- [x] Reorganized documentation to clarify the dependencies between stories
 
 ## Authentication Implementation Completed
-- [x] Create a new Firebase project in the Firebase console:
-  - [x] Go to the Firebase console
-  - [x] Create a new project for AI Feed Consolidator
-  - [x] Configure project settings
-- [x] Configure authentication methods:
-  - [x] Enable Google authentication
-  - [x] Configure OAuth consent screen for Google authentication
-  - [x] Set up authorized domains for authentication
-- [x] Update environment variables:
-  - [x] Replace test Firebase credentials with real credentials in .env file
-  - [x] Ensure all required Firebase environment variables are properly set
-  - [x] Update Firebase Admin SDK credentials for server authentication
-- [x] Simplify authentication UI to use only Google Sign-in:
-  - [x] Remove email/password sign-in/sign-up forms
-  - [x] Add prominent Google sign-in button to the Login page
-  - [x] Update NavBar to show appropriate authentication UI
-- [x] Test authentication flow:
-  - [x] Verify Google authentication
-  - [x] Verify logout functionality
-  - [x] Verify authentication persistence
-  - [x] Add logout button to home page
-- [x] Fix Google authentication issues
-  - [x] Remove TRPC dependencies from authentication code
-  - [x] Handle authentication errors properly
-  - [x] Ensure Firebase credentials are working correctly
+- [x] Create a new Firebase project in the Firebase console
+- [x] Configure authentication methods (Google authentication)
+- [x] Update environment variables with real Firebase credentials
+- [x] Simplify authentication UI to use only Google Sign-in
+- [x] Test authentication flow and verify it works correctly
+- [x] Add logout button to the home page and enhance the UI
+- [x] Fix Google authentication issues (TRPC dependencies, etc.)
 
 ## Issues/Blockers
-- None currently - Firebase authentication is working perfectly
+- None currently - Firebase authentication is complete and working
 
 ## Recently Completed
+- Reorganized project stories to better reflect dependencies
+- Created Story 002.1 (User Profile Management) that depends on Story 002 
 - Successfully implemented and tested Google authentication flow
 - Added logout button to the home page with a user-friendly header
 - Added personalized welcome message showing the user's name from Google profile
@@ -69,6 +44,12 @@ Decide whether to complete the user profile management portion of Story 001.1 or
 - Created a real Firebase project with proper credentials
 
 ## Decisions Made
+- Split Story 001.1 into two parts:
+  - Core authentication (Story 001.1) - now marked as DONE
+  - User profile management (New Story 002.1) - depends on database schema
+- This separation clarifies the technical dependencies and creates a cleaner project flow
+- Core authentication doesn't require database schema and is independently functional
+- User profile management logically depends on having a database schema in place first
 - Simplified the authentication to use only Google sign-in for better user experience
 - Enhanced the home page with a header, app name, and dedicated logout button
 - Added personalized welcome message showing the user's name from their Google account
@@ -76,27 +57,23 @@ Decide whether to complete the user profile management portion of Story 001.1 or
 - Removed Firebase measurement ID since analytics is not being used
 
 ## Lessons Learned
+- Breaking stories along technical dependency lines creates clearer, more manageable work
 - Google authentication provides a superior user experience compared to email/password
 - Firebase's Google sign-in provides user profile data automatically (name, email, profile picture)
 - Adding personalized elements like user's name creates a better user experience
 - TRPC utilities can cause issues if not properly initialized or if they're not available
 - Firebase Admin SDK initialization requires special handling in development mode
 
-## Next Steps Decision
-We now have two options for how to proceed:
+## Next Steps
+1. Begin work on Story 002 (Local PostgreSQL and Schema Implementation):
+   - Set up local PostgreSQL database properly
+   - Design and implement database schema
+   - Create necessary tables for users, feeds, content, etc.
+   - Set up Prisma ORM for database interactions
 
-1. **Complete User Profile Management**:
-   - Implement database storage of user profiles
-   - Create/update user records when they authenticate
-   - Store additional user information from Google profile
-   - Implement profile editing functionality
-
-2. **Move to Story 002: Local PostgreSQL and Schema Implementation**:
-   - Consider the authentication portion complete
-   - Implement the database schema needed for all application features
-   - Set up proper relationships between users and other data
-   - User profile management could be handled as part of this story
-
-The second option might make more sense since we need to implement the database schema before we can properly store user profiles. Story 002 focuses on setting up the local PostgreSQL database and implementing the schema, which would provide the foundation for user profile management.
+2. Then proceed to Story 002.1 (User Profile Management):
+   - Implement storage of user profile data in the database
+   - Create API endpoints for user profile management
+   - Enhance the UI to display and edit user profiles
 
 Keep this file concise (<300 lines): summarize or remove outdated info regularly to prevent overloading the context. Focus on the current phase and immediate next steps.
