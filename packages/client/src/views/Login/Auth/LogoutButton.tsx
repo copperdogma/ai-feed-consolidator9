@@ -1,14 +1,11 @@
 import { Button } from 'evergreen-ui'
-import { trpc } from 'lib/trpc'
+import { useAuth } from '../../../hooks/useAuth'
 
 const LogoutButton = () => {
-  const utils = trpc.useUtils()
-  const logout = trpc.auth.logout.useMutation({
-    onSuccess: () => utils.auth.getUser.invalidate()
-  })
+  const { logout } = useAuth()
 
   return (
-    <Button appearance="primary" cursor="pointer" onClick={() => logout.mutate()}>
+    <Button appearance="primary" cursor="pointer" onClick={() => logout()}>
       Logout
     </Button>
   )

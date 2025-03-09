@@ -92,6 +92,38 @@ yarn prisma:migrate:dev
 yarn typecheck
 ```
 
+### Docker Development
+
+The project uses Docker for containerization with hot reloading enabled for a better development experience:
+
+- Start the containers:
+```bash
+docker-compose up -d
+```
+
+- View logs:
+```bash
+docker-compose logs client
+docker-compose logs server
+```
+
+- Rebuild containers (only needed when Dockerfile or dependencies change):
+```bash
+docker-compose down && docker-compose build --no-cache && docker-compose up -d
+```
+
+See [Docker Configuration Guide](docs/docker-setup.md) for more details on the Docker setup and hot reloading configuration.
+
+### Development Tools
+
+This project uses several specialized development tools including:
+
+- Browser Tools MCP for browser integration and debugging
+- MCP Server Git Tools for enhanced version control
+- Docker with hot reloading for development
+
+For details on these tools and how they're used in the project, see the [Development Tools Guide](docs/development-tools.md).
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { trpc } from 'lib/trpc'
 import {
   Button,
   majorScale,
@@ -8,8 +7,10 @@ import {
   Heading,
   toaster,
   Popover,
-  Position
+  Position,
+  Text
 } from 'evergreen-ui'
+import { useAuth } from '../../../hooks/useAuth'
 
 type SignUpButtonProps = {
   isOpen: boolean
@@ -17,107 +18,112 @@ type SignUpButtonProps = {
 }
 
 export default function SignUpButton({ isOpen, setIsOpen }: SignUpButtonProps) {
+  const { signUp, signInWithGoogle, error: authError } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const utils = trpc.useUtils()
-
-  const signUp = trpc.auth.signUp.useMutation({
-    onSuccess: async () => {
-      await utils.auth.getUser.invalidate()
-      toaster.success('Sign-up successful!')
-    },
-    onError: (error) => {
-      console.error(error)
-      if (error.data?.code === 'CONFLICT') {
-        toaster.danger(error.message)
-      } else {
-        toaster.danger('Sign-up failed, please try again.')
-      }
-    }
-  })
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
-      return toaster.danger('Passwords do not match.')
+      toaster.danger('Passwords do not match')
+      return
     }
-    await signUp.mutateAsync({ email, password })
-    setIsOpen(false)
+
+    try {
+      setIsLoading(true)
+      await signUp(email, password)
+      toaster.success('Account created successfully!')
+      setIsOpen(false)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to sign up'
+      toaster.danger(message)
+    } finally {
+      setIsLoading(false)
+    }
   }
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true)
+      await signInWithGoogle()
+      toaster.success('Successfully signed in with Google!')
+      setIsOpen(false)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to sign in with Google'
+      toaster.danger(message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
-    <Popover
-      isShown={isOpen}
-      onOpen={() => setIsOpen(true)}
-      onClose={() => setIsOpen(false)}
-      position={Position.BOTTOM_RIGHT}
-      content={
-        <Pane
-          width={320}
-          paddingX={majorScale(3)}
-          paddingY={majorScale(3)}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          flexDirection="column"
-          gap={majorScale(2)}
-          background="white"
-          elevation={1}
-          borderRadius={4}
-        >
-          <Heading size={700} fontWeight={400}>
-            Sign Up
-          </Heading>
-          <TextInput
-            width="100%"
-            placeholder="Email"
-            value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value)
-            }
-          />
-          <TextInput
-            width="100%"
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPassword(e.target.value)
-            }
-          />
-          <TextInput
-            width="100%"
-            placeholder="Confirm Password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setConfirmPassword(e.target.value)
-            }
-            onKeyDown={async (e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === 'Enter') {
-                await handleSignUp()
-              }
-            }}
-          />
-          <Button
-            appearance="primary"
-            intent="success"
-            onClick={async () => await handleSignUp()}
-            isLoading={signUp.isLoading}
-            width="100%"
+    <>
+      <Popover
+        isShown={isOpen}
+        onClose={() => setIsOpen(false)}
+        position={Position.BOTTOM_LEFT}
+        content={
+          <Pane
+            padding={majorScale(3)}
+            width={300}
+            display="flex"
+            flexDirection="column"
+            gap={majorScale(2)}
           >
-            Sign Up
-          </Button>
-        </Pane>
-      }
-    >
-      <Button
-        appearance={isOpen ? 'minimal' : 'primary'}
-        intent={isOpen ? 'none' : 'success'}
-        cursor="pointer"
-        onClick={() => setIsOpen(!isOpen)}
+            <Heading size={700} marginBottom={majorScale(2)}>
+              Sign Up
+            </Heading>
+            {authError && (
+              <Text color="danger">{authError}</Text>
+            )}
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <TextInput
+              placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <TextInput
+              placeholder="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <Button
+              appearance="primary"
+              intent="success"
+              isLoading={isLoading}
+              onClick={handleSignUp}
+              marginTop={majorScale(1)}
+            >
+              Sign Up
+            </Button>
+            <Pane marginTop={majorScale(1)} marginBottom={majorScale(1)}>
+              <Text>Or</Text>
+            </Pane>
+            <Button
+              appearance="default"
+              onClick={handleGoogleSignIn}
+              isLoading={isLoading}
+            >
+              Sign In with Google
+            </Button>
+          </Pane>
+        }
       >
-        Sign Up
-      </Button>
-    </Popover>
+        <Button
+          appearance="primary"
+          cursor="pointer"
+          onClick={() => setIsOpen(true)}
+        >
+          Sign Up
+        </Button>
+      </Popover>
+    </>
   )
 }

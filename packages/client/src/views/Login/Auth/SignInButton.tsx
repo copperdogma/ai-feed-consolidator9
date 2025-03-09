@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { trpc } from 'lib/trpc'
 import {
   Button,
   majorScale,
@@ -8,8 +7,10 @@ import {
   Heading,
   toaster,
   Popover,
-  Position
+  Position,
+  Text
 } from 'evergreen-ui'
+import { useAuth } from '../../../hooks/useAuth'
 
 type SignInButtonProps = {
   isOpen: boolean
@@ -17,86 +18,100 @@ type SignInButtonProps = {
 }
 
 export default function SignInButton({ isOpen, setIsOpen }: SignInButtonProps) {
+  const { signIn, signInWithGoogle, error: authError } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const utils = trpc.useUtils()
-
-  const signIn = trpc.auth.signIn.useMutation({
-    onSuccess: async () => {
-      await utils.auth.getUser.invalidate()
-      toaster.success('Sign-in successful!', { duration: 2 })
-    },
-    onError: (error) => {
-      console.error(error)
-      toaster.danger('Sign-in failed, please try again.')
-    }
-  })
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSignIn = async () => {
-    await signIn.mutateAsync({ email, password })
-    setIsOpen(false)
+    try {
+      setIsLoading(true)
+      await signIn(email, password)
+      toaster.success('Successfully signed in!')
+      setIsOpen(false)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to sign in'
+      toaster.danger(message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true)
+      await signInWithGoogle()
+      toaster.success('Successfully signed in with Google!')
+      setIsOpen(false)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to sign in with Google'
+      toaster.danger(message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <Popover
-      isShown={isOpen}
-      onOpen={() => setIsOpen(true)}
-      onClose={() => setIsOpen(false)}
-      position={Position.BOTTOM_RIGHT}
-      content={
-        <Pane
-          width={320}
-          paddingX={majorScale(3)}
-          paddingY={majorScale(3)}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          flexDirection="column"
-          gap={majorScale(2)}
-          background="white"
-          elevation={1}
-          borderRadius={4}
-        >
-          <Heading size={700} fontWeight={400}>
-            Sign In
-          </Heading>
-          <TextInput
-            width="100%"
-            placeholder="Email"
-            value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value)
-            }
-          />
-          <TextInput
-            width="100%"
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPassword(e.target.value)
-            }
-            onKeyDown={async (e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === 'Enter') {
-                await handleSignIn()
-              }
-            }}
-          />
-          <Button
-            appearance="primary"
-            intent="success"
-            onClick={async () => await handleSignIn()}
-            isLoading={signIn.isLoading}
-            width="100%"
+    <>
+      <Popover
+        isShown={isOpen}
+        onClose={() => setIsOpen(false)}
+        position={Position.BOTTOM_LEFT}
+        content={
+          <Pane
+            padding={majorScale(3)}
+            width={300}
+            display="flex"
+            flexDirection="column"
+            gap={majorScale(2)}
           >
-            Sign In
-          </Button>
-        </Pane>
-      }
-    >
-      <Button cursor="pointer" onClick={() => setIsOpen(!isOpen)}>
-        Sign In
-      </Button>
-    </Popover>
+            <Heading size={700} marginBottom={majorScale(2)}>
+              Sign In
+            </Heading>
+            {authError && (
+              <Text color="danger">{authError}</Text>
+            )}
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <TextInput
+              placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button
+              appearance="primary"
+              intent="success"
+              isLoading={isLoading}
+              onClick={handleSignIn}
+              marginTop={majorScale(1)}
+            >
+              Sign In
+            </Button>
+            <Pane marginTop={majorScale(1)} marginBottom={majorScale(1)}>
+              <Text>Or</Text>
+            </Pane>
+            <Button
+              appearance="default"
+              onClick={handleGoogleSignIn}
+              isLoading={isLoading}
+            >
+              Sign In with Google
+            </Button>
+          </Pane>
+        }
+      >
+        <Button
+          appearance="minimal"
+          cursor="pointer"
+          onClick={() => setIsOpen(true)}
+        >
+          Sign In
+        </Button>
+      </Popover>
+    </>
   )
 }

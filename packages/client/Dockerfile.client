@@ -1,10 +1,30 @@
 FROM node:20
 WORKDIR /app
 
+# Copy package files and install dependencies
 COPY package*.json ./
-
 RUN npm install
-COPY . .
+RUN npm install --save firebase
 
+# Copy the tsconfig.json and vite config files
+COPY tsconfig.json ./
+COPY vite.config.ts ./
+
+# Copy the index.html template
+COPY index.html ./
+
+# Create basic src directory structure to avoid errors
+RUN mkdir -p src/lib
+COPY src/lib/server-types.ts ./src/lib/
+COPY src/lib/trpc.ts ./src/lib/
+
+# Create a dummy server directory with a tsconfig.json to prevent errors
+RUN mkdir -p /server
+RUN echo '{"compilerOptions":{"target":"es2018","module":"commonjs"}}' > /server/tsconfig.json
+
+# The rest of the source code will be mounted as a volume
+# in docker-compose.yaml for hot reloading
+
+# Add host flag to vite command for proper hot reloading
 EXPOSE 5173
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

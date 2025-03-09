@@ -9,7 +9,7 @@ AI Feed Consolidator Application
 ## Story List
 | Story ID | Title                                   | Priority | Status    | Link                                                   |
 |----------|----------------------------------------|----------|-----------|--------------------------------------------------------|
-| 001      | Project Setup and Infrastructure        | High     | To Do     | /docs/stories/story-001-project-setup-infrastructure.md |
+| 001      | Project Setup and Infrastructure        | High     | Done      | /docs/stories/story-001-project-setup-infrastructure.md |
 | 002      | Local PostgreSQL and Schema Implementation | High     | To Do     | /docs/stories/story-002-local-database-setup.md |
 | 003      | RSS Feed Integration                    | High     | To Do     | /docs/stories/story-003-rss-feed-integration.md         |
 | 004      | YouTube Integration                     | High     | To Do     | /docs/stories/story-004-youtube-integration.md          |

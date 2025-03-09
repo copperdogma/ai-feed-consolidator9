@@ -177,7 +177,46 @@ This architecture allows for a Docker-based deployment (either locally or on fly
 
 ## Project Structure
 
-The AI Feed Consolidator project is structured as a monorepo using Yarn workspaces, with separate packages for the client and server components. The project is based on the jason-greenberg/trpc-express-prisma-react-vite-docker-starter repository, with modifications to meet our specific requirements.
+The project uses a monorepo approach, with the following structure:
+
+- `packages/client`: React application built with Vite
+- `packages/server`: Node.js/Express application using tRPC
+- `docs`: Project documentation
+- `scripts`: Utility scripts for development and deployment
+
+### Docker Configuration
+
+Docker is used for containerization of both client and server applications, with the following considerations:
+
+- PostgreSQL runs locally on the host machine, not in a container
+- Docker containers are configured to connect to the local PostgreSQL instance
+- Firebase dependencies are included in both client and server Dockerfiles
+- Volume mounts are configured for hot reloading during development
+- Environment variables for Firebase and other services are passed through docker-compose.yaml
+
+#### Hot Reloading Implementation
+
+The project uses a robust hot reloading setup to improve developer experience:
+
+1. **Volume Mounts**: Source code directories are mounted into the containers, allowing changes to be immediately reflected:
+   ```yaml
+   volumes:
+     - ./packages/client:/app
+     - /app/node_modules
+   ```
+
+2. **Node Modules Preservation**: A special volume mount for node_modules prevents host files from overwriting container dependencies.
+
+3. **Vite Configuration**: The client's Vite development server is configured with the `--host 0.0.0.0` flag to enable connections from outside the container.
+
+4. **Docker Optimizations**:
+   - Package.json files are copied and dependencies installed before copying the rest of the source code
+   - This leverages Docker's layer caching for faster rebuilds
+   - A special workaround for server dependencies involves creating a dummy tsconfig.json to prevent Vite build errors
+
+5. **Environment Variable Passing**: Environment variables from .env files are passed to containers for configuration.
+
+This setup allows developers to make changes to the code on their local machine and see those changes immediately reflected in the running application, without requiring container rebuilds for most code changes.
 
 ### Root Structure
 ```
@@ -254,3 +293,20 @@ The following modifications will be made to the starter template to meet our req
    - Add content detail views
 
 These modifications will transform the starter template into a fully-functional AI Feed Consolidator application that meets all the requirements specified in the project documentation.
+
+## Authentication
+
+Authentication is handled using Firebase Authentication, with the following features:
+
+- Email/password authentication
+- Google authentication
+- JWT tokens for API authentication
+- Firebase Admin SDK for token verification on the server
+
+### Authentication Flow
+
+1. Users register or sign in using email/password or Google authentication
+2. Firebase issues a JWT token
+3. The token is passed to the server with each API request
+4. The server verifies the token using Firebase Admin SDK
+5. Resources are only accessible to authenticated users

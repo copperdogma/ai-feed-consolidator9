@@ -1,6 +1,6 @@
 # Story: Project Setup and Infrastructure
 
-**Status**: To Do
+**Status**: Done
 
 ---
 
@@ -21,58 +21,66 @@ This story aligns with the [Architecture Overview](../design.md#architecture-ove
 - CI/CD pipeline is configured (if applicable)
 
 ## Tasks
-- [ ] Initialize Git repository with proper .gitignore
-- [ ] Create project directory structure:
-  - [ ] `/frontend` - React application
-  - [ ] `/backend` - Node.js/Express application
-  - [ ] `/database` - Database migrations and schema
-  - [ ] `/docker` - Docker configuration files
-- [ ] Set up Docker and Docker Compose:
-  - [ ] Create Dockerfile for frontend
-  - [ ] Create Dockerfile for backend
-  - [ ] Configure Docker Compose to connect to local PostgreSQL
+- [x] Initialize Git repository with proper .gitignore
+- [x] Create project directory structure:
+  - [x] Use monorepo structure with packages directory:
+    - [x] `packages/client` - React application
+    - [x] `packages/server` - Node.js/Express application with tRPC
+- [x] Set up Docker and Docker Compose:
+  - [x] Create Dockerfile for client
+  - [x] Create Dockerfile for server
+  - [x] Configure Docker Compose to connect to local PostgreSQL
   - [x] Remove PostgreSQL container from Docker configuration
   - [x] Configure networking to allow Docker containers to access local PostgreSQL
-- [ ] Set up local PostgreSQL:
+  - [x] Add Firebase dependencies to Dockerfiles
+  - [x] Configure volume mounts for hot reloading
+- [x] Set up local PostgreSQL:
   - [x] Install PostgreSQL on host machine (already installed)
   - [x] Configure PostgreSQL to accept connections from Docker
   - [x] Create initial databases for development and testing
-- [ ] Initialize frontend application:
-  - [ ] Set up Vite with React and TypeScript
-  - [ ] Configure React Query
-  - [ ] Set up basic routing
-- [ ] Set up Firebase Authentication:
-  - [ ] Create Firebase project
-  - [ ] Configure Firebase Authentication
-  - [ ] Set up user management
-  - [ ] Implement login and registration components
-  - [ ] Configure Firebase SDK in frontend
-- [ ] Initialize backend application:
-  - [ ] Set up Node.js with Express
-  - [ ] Configure TypeScript
-  - [ ] Set up basic API structure
-  - [ ] Configure Firebase Admin SDK for token verification
-  - [ ] Implement JWT middleware for API authentication
-- [ ] Set up database connection:
-  - [ ] Configure connection to local PostgreSQL
-  - [ ] Initialize Prisma ORM
-  - [ ] Create initial schema
-  - [ ] Test connection from Docker containers
-- [ ] Configure environment variables:
-  - [ ] Create .env.example file
-  - [ ] Document required environment variables
-  - [ ] Add Firebase configuration variables
-  - [ ] Configure database connection variables for local PostgreSQL
-- [ ] Write documentation:
-  - [ ] Update README.md with setup instructions
-  - [ ] Document development workflow
-  - [ ] Document Firebase Authentication setup
-  - [ ] Document local PostgreSQL setup and connection
+- [x] Initialize client application:
+  - [x] Set up Vite with React and TypeScript
+  - [x] Configure React Query
+  - [x] Set up basic routing
+- [x] Set up Firebase Authentication:
+  - [x] Create Firebase project
+  - [x] Configure Firebase Authentication
+  - [x] Set up user management
+  - [x] Implement login and registration components
+  - [x] Configure Firebase SDK in frontend
+  - [x] Add Google authentication to login and signup components
+- [x] Initialize server application:
+  - [x] Set up Node.js with Express
+  - [x] Configure TypeScript
+  - [x] Set up basic API structure with tRPC
+  - [x] Configure Firebase Admin SDK for token verification
+  - [x] Implement JWT middleware for API authentication
+- [x] Set up database connection:
+  - [x] Configure connection to local PostgreSQL
+  - [x] Initialize Prisma ORM
+  - [x] Create initial schema
+  - [x] Test connection from Docker containers
+- [x] Configure environment variables:
+  - [x] Create .env file
+  - [x] Document required environment variables
+  - [x] Add Firebase configuration variables
+  - [x] Configure database connection variables for local PostgreSQL
+- [x] Write documentation:
+  - [x] Create comprehensive README.md
+  - [x] Document development workflow
+  - [x] Document Firebase Authentication setup
+  - [x] Document local PostgreSQL setup and connection
 
 ## Notes
-- This story is foundational and must be completed before other stories can begin
-- The project structure should be modular to allow for future expansion
-- Security best practices should be followed from the beginning
-- Consider using a monorepo approach for easier management
-- Firebase Authentication should be implemented early to enable user management functionality
-- Local PostgreSQL setup is required before any database operations can be performed 
+- This story has been completed successfully
+- Project structure uses a monorepo approach for easier management
+- Docker containers are now properly configured with Firebase dependencies
+- Hot reloading has been implemented for better development experience:
+  - Volume mounts for source code directories allow immediate reflection of changes
+  - Special handling for node_modules prevents dependency conflicts
+  - Vite configured with host flags for external connections
+  - Docker layer caching optimized for faster builds
+  - Implemented a workaround for cross-package dependencies in the monorepo
+- Google authentication has been added to enhance the user authentication options
+- Docker containers are configured to connect to local PostgreSQL
+- The initial project structure is now in place and ready for feature development 

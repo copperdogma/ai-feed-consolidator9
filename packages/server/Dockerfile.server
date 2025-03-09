@@ -2,20 +2,27 @@ FROM node:20
 
 WORKDIR /app
 
+# Copy package.json and package-lock.json
 COPY package*.json ./
-RUN npm install
 
-COPY . .
+# Install dependencies including Firebase Admin SDK
+RUN npm install
+RUN npm install --save firebase-admin
+
+# We're not copying the source files here anymore
+# Instead, they will be mounted as a volume in docker-compose.yaml
 
 # Set the target platform and OpenSSL version
 ENV PRISMA_CLI_BINARY_TARGETS=linux-arm64-openssl-3.0.x
 
-# Generate Prisma Client using npx
-RUN npx prisma generate
+# Generate Prisma Client - we'll run this on startup to ensure it's up to date
+# RUN npx prisma generate
 
 EXPOSE 3001
 
+# Apply migrations and start the server with improved watch options
 CMD if [ "$ENVIRONMENT" = "development" ]; then \
+      npx prisma generate; \
       npx prisma migrate deploy; \
     fi \
-    && npx tsx watch --clear-screen=false ./src/main.ts
+    && npx tsx watch --clear-screen=false --ignore node_modules ./src/main.ts

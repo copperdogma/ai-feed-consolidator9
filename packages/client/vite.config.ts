@@ -9,8 +9,6 @@ export default ({ mode }) => {
     plugins: [react()],
     resolve: {
       alias: {
-        server: path.resolve(__dirname, '../server'),
-        'server/*': path.resolve(__dirname, '../server/*'),
         components: path.resolve(__dirname, './src/components'),
         lib: path.resolve(__dirname, './src/lib'),
         assets: path.resolve(__dirname, './src/assets'),
@@ -18,6 +16,9 @@ export default ({ mode }) => {
         App: path.resolve(__dirname, './src/App.tsx'),
         views: path.resolve(__dirname, './src/views'),
       }
+    },
+    optimizeDeps: {
+      exclude: ['server']
     },
     server: {
       port: parseInt(process.env.VITE_CLIENT_PORT)

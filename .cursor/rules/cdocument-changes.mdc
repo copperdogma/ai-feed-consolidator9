@@ -1,0 +1,8 @@
+---
+description: For documenting major code or architecture changes
+globs: src/tests/**/*
+alwaysApply: false
+---
+If you've just made major changes to the code or architecture, see [project-management.mdc](mdc:.cursor/rules/project-management.mdc) for details on how and where those changes should be documented.
+
+Then go ahead and modify the documentation accordin to [project-management.mdc](mdc:.cursor/rules/project-management.mdc).
