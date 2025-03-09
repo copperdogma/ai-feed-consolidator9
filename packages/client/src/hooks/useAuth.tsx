@@ -10,7 +10,6 @@ import {
   getIdToken
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
-import { trpc } from '../lib/trpc';
 
 interface AuthContextType {
   currentUser: FirebaseUser | null;
@@ -37,26 +36,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const utils = trpc.useUtils();
 
   // Listen for auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       setLoading(false);
-      
-      if (user) {
-        try {
-          // Trigger revalidation of user data
-          await utils.auth.getUser.invalidate();
-        } catch (error) {
-          console.error('Error invalidating user data:', error);
-        }
-      }
     });
 
     return () => unsubscribe();
-  }, [utils.auth.getUser]);
+  }, []);
 
   // Sign in with email and password
   const signIn = async (email: string, password: string): Promise<FirebaseUser> => {
@@ -102,8 +91,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async (): Promise<void> => {
     try {
       await signOut(auth);
-      // Invalidate user query data after logout
-      await utils.auth.getUser.invalidate();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to log out';
       setError(errorMessage);
