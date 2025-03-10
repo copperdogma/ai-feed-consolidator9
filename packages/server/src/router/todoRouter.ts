@@ -18,7 +18,9 @@ export const todoRouter = router({
       // Create a new todo
       return await prisma.todo.create({
         data: {
-          title: input.title
+          id: crypto.randomUUID(),
+          title: input.title,
+          updatedAt: new Date()
         }
       })
     }),

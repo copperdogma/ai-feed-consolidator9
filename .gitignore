@@ -4,8 +4,8 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 lerna-debug.log*
-.pnpm-debug.log*
 
 # Runtime data
 pids
@@ -18,11 +18,28 @@ postgres_data/*
 data
 node_modules
 dist
+dist-ssr
+*.local
 build
-*.tsbuildinfo
+.svelte-kit
+.astro
+coverage
+.turbo
+out
+.next
+.vercel
+.temp
+.cache
 
 # Package manager specific
-*/node_modules
+.npm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+**/node_modules/
+.pnpm-store/
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -38,13 +55,27 @@ yarn.lock
 *.env.development.local
 *.env.test.local
 *.env.production.local
+!.env.example
 
 # Generated files
-packages/server/src/generated/*
+*.tsbuildinfo
+.prisma
+.eslintcache
+.stylelintcache
+prisma/generated
+prisma/.env
+firebase-debug*.log
+firebase-debug.log
+generated/
+**/src/generated/**
+# Experimental test files
+packages/server/src/test-repo.ts
+packages/server/src/test-transaction.ts
 
 # Prisma sqlite
 *dev.db*
 *dev.db-journal
+.prisma/
 
 # IDE specific files
 .idea
@@ -52,17 +83,41 @@ packages/server/src/generated/*
 *.sublime-project
 *.sublime-workspace
 .DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.vscode/*
+!.vscode/extensions.json
 
 # Testing
-coverage
-.nyc_output
+test-results/
+reports/
+*.lcov
+junit.xml
+playwright-report
 
 # Temporary files
+tmp/
+temp/
 .tmp
-temp
-.cache
 
-# Firebase
-.firebase/
-firebase-debug.log
-ui-debug.log
+# Docker volumes
+postgres_data/
+
+# OS-specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

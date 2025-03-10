@@ -9,6 +9,12 @@ COPY package*.json ./
 RUN npm install
 RUN npm install --save firebase-admin
 
+# Copy prisma schema
+COPY prisma ./prisma/
+
+# Copy application code
+COPY . .
+
 # We're not copying the source files here anymore
 # Instead, they will be mounted as a volume in docker-compose.yaml
 
@@ -20,9 +26,5 @@ ENV PRISMA_CLI_BINARY_TARGETS=linux-arm64-openssl-3.0.x
 
 EXPOSE 3001
 
-# Apply migrations and start the server with improved watch options
-CMD if [ "$ENVIRONMENT" = "development" ]; then \
-      npx prisma generate; \
-      npx prisma migrate deploy; \
-    fi \
-    && npx tsx watch --clear-screen=false --ignore node_modules ./src/main.ts
+# Use 'db push' instead of migrations
+CMD npx prisma generate && npx prisma db push && npm run dev

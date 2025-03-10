@@ -54,6 +54,7 @@ AI Feed Consolidator is designed to help you manage information overload by:
 - Docker and Docker Compose
 - Firebase account
 - OpenAI API key
+- PostgreSQL database (not containerized, running locally)
 
 ### Installation
 
@@ -73,56 +74,46 @@ cp .env.example .env
    - Firebase authentication settings
    - OpenAI API key
 
-4. Build and start the containers:
+4. Create PostgreSQL databases:
 ```bash
-yarn develop
+createdb ai_feed_consolidator
+createdb ai_feed_test
 ```
 
-5. Access the application at http://localhost:5173
-
-## Development
-
-- Run database migrations (if needed):
+5. Apply database schema:
 ```bash
-yarn prisma:migrate:dev
+cd packages/server
+npx prisma db push
 ```
 
-- Run type checking:
-```bash
-yarn typecheck
-```
-
-### Docker Development
-
-The project uses Docker for containerization with hot reloading enabled for a better development experience:
-
-- Start the containers:
+6. Build and start the containers:
 ```bash
 docker-compose up -d
 ```
 
-- View logs:
-```bash
-docker-compose logs client
-docker-compose logs server
-```
+7. Access the application at http://localhost:5173
 
-- Rebuild containers (only needed when Dockerfile or dependencies change):
-```bash
-docker-compose down && docker-compose build --no-cache && docker-compose up -d
-```
+## Development
 
-See [Docker Configuration Guide](docs/docker-setup.md) for more details on the Docker setup and hot reloading configuration.
+### Database Management
 
-### Development Tools
+- Apply schema changes: `npx prisma db push`
+- Generate migrations: `npx prisma migrate dev --name [migration_name]`
+- Reset development database: `./scripts/reset-db.sh`
 
-This project uses several specialized development tools including:
+### Docker Commands
 
-- Browser Tools MCP for browser integration and debugging
-- MCP Server Git Tools for enhanced version control
-- Docker with hot reloading for development
+- Start containers: `docker-compose up -d`
+- View logs: `docker-compose logs client` or `docker-compose logs server`
+- Rebuild if needed: `docker-compose down && docker-compose build --no-cache && docker-compose up -d`
 
-For details on these tools and how they're used in the project, see the [Development Tools Guide](docs/development-tools.md).
+## Documentation
+
+For more detailed documentation, see the following:
+- [Database Schema](docs/erd-diagram.md)
+- [Firebase Authentication](docs/stories/story-001.1-firebase-authentication-implementation.md)
+- [Docker Configuration](docs/docker-setup.md)
+- [Development Tools](docs/development-tools.md)
 
 ## Contributing
 

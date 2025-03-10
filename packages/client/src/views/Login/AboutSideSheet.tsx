@@ -73,7 +73,7 @@ const AboutSideSheet = ({ isShown, setIsShown }: Props) => (
             </Heading>
             <UnorderedList>
               <ListItem>
-                <Text>Login, logout, and registration with JWT tokens</Text>
+                <Text>Login, logout, and registration with Firebase Authentication</Text>
               </ListItem>
               <ListItem>
                 <Text>
