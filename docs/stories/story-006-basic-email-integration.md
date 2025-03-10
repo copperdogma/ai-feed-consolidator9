@@ -22,6 +22,10 @@ This story aligns with the [Email Integration](../design.md#email-integration) s
 - Email attachments are properly handled
 
 ## Tasks
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
 - [ ] Implement email access:
   - [ ] Evaluate and select email access library (IMAP/POP3)
   - [ ] Implement secure email credential storage

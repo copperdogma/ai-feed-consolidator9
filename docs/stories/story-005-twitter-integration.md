@@ -23,6 +23,10 @@ This story aligns with the [X/Twitter Integration](../design.md#xtwitter-integra
 - API rate limits are respected
 
 ## Tasks
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
 - [ ] Implement X/Twitter API authentication:
   - [ ] Register application with X/Twitter Developer Portal
   - [ ] Configure OAuth 2.0 credentials

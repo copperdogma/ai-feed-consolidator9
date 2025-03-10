@@ -22,6 +22,10 @@ This story aligns with the [Search and Filter](../design.md#search-and-filter) s
 - Search results highlight matching terms
 
 ## Tasks
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
 - [ ] Implement database search capabilities:
   - [ ] Configure PostgreSQL full-text search
   - [ ] Create search indexes for content tables

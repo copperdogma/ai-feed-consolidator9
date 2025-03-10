@@ -26,6 +26,10 @@ This story aligns with the [Content Views](../design.md#content-views) subsectio
 - Empty states are handled appropriately
 
 ## Tasks
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
 - [ ] Design view architecture:
   - [ ] Create view layout components
   - [ ] Design view navigation structure

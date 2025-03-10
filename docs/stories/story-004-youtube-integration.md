@@ -23,7 +23,11 @@ This story aligns with the [YouTube Integration](../design.md#youtube-integratio
 - API rate limits are respected
 
 ## Tasks
-- [ ] Implement YouTube API authentication:
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
+- [ ] Implement YouTube API integration:
   - [ ] Register application with Google Developer Console
   - [ ] Configure OAuth 2.0 credentials
   - [ ] Implement authentication flow

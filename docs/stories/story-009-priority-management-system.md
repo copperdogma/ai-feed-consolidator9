@@ -22,6 +22,10 @@ This story aligns with the [Priority Management](../design.md#priority-managemen
 - Bulk priority management is available
 
 ## Tasks
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
 - [ ] Define priority system:
   - [ ] Create priority level enum (High, Medium, Low)
   - [ ] Define priority data model in database

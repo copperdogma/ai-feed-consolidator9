@@ -23,6 +23,10 @@ This story aligns with the [Deployment](../design.md#deployment) section of the 
 - Cost optimization strategies are implemented
 
 ## Tasks
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
 - [ ] Set up fly.io account and CLI:
   - [ ] Install and configure flyctl CLI
   - [ ] Authenticate with existing account

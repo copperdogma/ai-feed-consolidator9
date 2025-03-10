@@ -22,12 +22,16 @@ This story aligns with the [Topic Detection and Management](../design.md#topic-d
 - Topics are presented in a clear hierarchy or list
 
 ## Tasks
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
 - [ ] Design topic detection algorithm:
   - [ ] Research natural language processing approaches
-  - [ ] Evaluate OpenAI API for topic extraction
-  - [ ] Determine balance between accuracy and performance
-  - [ ] Define topic confidence scoring methodology
-  - [ ] Create topic extraction rules for different content types
+  - [ ] Evaluate keyword extraction vs. semantic analysis
+  - [ ] Define topic granularity levels
+  - [ ] Create test dataset for algorithm evaluation
+  - [ ] Select approach based on accuracy and performance
 - [ ] Implement core topic detection:
   - [ ] Create topic extraction service
   - [ ] Implement text processing for topic identification
@@ -67,6 +71,7 @@ This story aligns with the [Topic Detection and Management](../design.md#topic-d
   - [ ] Implement incremental topic updates
   - [ ] Add topic re-analysis triggers
   - [ ] Create batch processing for efficiency
+- [ ] Evaluate topic detection approaches:
 
 ## Notes
 - Topic detection quality is crucial for effective content organization

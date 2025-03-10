@@ -31,7 +31,11 @@ This story aligns with the [Content Views](../design.md#content-views) subsectio
 - Card appearance can be customized through settings
 
 ## Tasks
-- [ ] Design content card architecture:
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
+- [ ] Design content card system:
   - [ ] Create base card component
   - [ ] Define card property interface
   - [ ] Design card layout structure

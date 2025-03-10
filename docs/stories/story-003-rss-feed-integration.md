@@ -22,6 +22,10 @@ This story aligns with the [RSS/Atom Feed Integration](../design.md#rssatom-feed
 - System respects HTTP caching headers for efficient fetching
 
 ## Tasks
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
 - [ ] Implement RSS/Atom parser:
   - [ ] Evaluate and select RSS/Atom parsing library
   - [ ] Implement support for RSS 2.0 format

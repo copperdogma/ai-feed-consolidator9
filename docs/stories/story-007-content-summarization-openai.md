@@ -22,15 +22,20 @@ This story aligns with the [Content Summarization](../design.md#feature-content-
 - Summaries meet the quality criteria specified in the requirements
 
 ## Tasks
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
 - [ ] Set up OpenAI API integration:
   - [ ] Configure API access with environment variables
   - [ ] Implement API client with rate limiting and error handling
   - [ ] Create testing utilities for the API
 - [ ] Design and implement prompt templates:
   - [ ] Create prompt for brief summary generation
-  - [ ] Create prompt for detailed summary generation
-  - [ ] Test prompts with various content types
-  - [ ] Optimize prompts for token efficiency
+  - [ ] Develop prompt for key point extraction
+  - [ ] Implement prompt for detailed summary
+  - [ ] Create prompt for content categorization
+  - [ ] Design prompt for action item identification
 - [ ] Implement two-level summary system:
   - [ ] Create service for brief summary generation
   - [ ] Create service for detailed summary generation

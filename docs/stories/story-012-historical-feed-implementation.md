@@ -22,7 +22,11 @@ This story aligns with the [Historical Data Management](../design.md#historical-
 - Priority changes are tracked over time
 
 ## Tasks
-- [ ] Design historical data architecture:
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
+- [ ] Design historical data model:
   - [ ] Define historical data retention policies
   - [ ] Create historical data storage model
   - [ ] Design activity tracking schema

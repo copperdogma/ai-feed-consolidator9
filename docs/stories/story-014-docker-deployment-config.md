@@ -23,6 +23,10 @@ This story aligns with the [Deployment](../design.md#deployment) section of the 
 - Documentation is provided for Docker usage
 
 ## Tasks
+- [ ] Follow Test-Driven Development (TDD) principles for all implemented features:
+  - [ ] Write tests before implementing the feature code
+  - [ ] Ensure all code has appropriate test coverage
+  - [ ] Run tests continuously during development
 - [ ] Set up development Docker configuration:
   - [ ] Create Dockerfile for frontend
   - [ ] Create Dockerfile for backend
