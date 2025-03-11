@@ -5,9 +5,12 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies including Firebase Admin SDK
+# Install dependencies for the correct platform
 RUN npm install
-RUN npm install --save firebase-admin
+
+# Install esbuild explicitly for the correct platform
+RUN npm uninstall esbuild
+RUN npm install esbuild@latest
 
 # Copy prisma schema
 COPY prisma ./prisma/

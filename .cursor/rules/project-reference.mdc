@@ -1,0 +1,139 @@
+---
+description: Overview of the entire project with tech and command references
+globs: 
+alwaysApply: true
+---
+# AI Feed Consolidator - Project Reference
+
+**NOTE: Keep this file EXTREMELY succinct**
+
+## Purpose
+AI Feed Consolidator is a content aggregation platform that consolidates RSS feeds, summarizes content, and provides personalized recommendations using AI. Users can manage content sources, view summaries, and prioritize content based on interests.
+
+## Project Layout
+```
+/packages
+  /client         # React frontend
+  /server         # Node.js backend
+    /src
+      /lib        # Core libraries (context, firebase-admin)
+      /repositories # Data access layer
+      /router     # API endpoints (tRPC routers)
+      /sdks       # External service clients (Prisma)
+      /services   # Business logic 
+      /tests      # Test files
+      /scripts    # Utility scripts
+    /prisma       # Database schema and migrations
+/docs             # Project documentation
+```
+
+## Data Model
+Core entities in `packages/server/prisma/schema.prisma`:
+- **User**: Account details, authentication
+- **Source**: Content sources (RSS, YouTube, Twitter, Email)
+- **Content**: Aggregated content items from sources
+- **Summary**: AI-generated content summaries
+- **Topic**: Content categorization
+- **ContentTopic**: Many-to-many relationship
+
+## Authentication Flow
+- Firebase Authentication (packages/server/src/lib/firebase-admin.ts)
+- tRPC context creation (packages/server/src/lib/context.ts)
+- Server-side auth middleware for protected endpoints
+- Client authentication through Firebase SDK
+- JWT tokens for session management
+
+## AI Integration
+- OpenAI API for content summarization (GPT-4/3.5-turbo)
+- Content priority detection based on user preferences
+- Topic classification of incoming content
+- Time-to-consume estimates for content items
+
+## Key Environment Variables
+- DATABASE_URL: PostgreSQL connection string
+- FIREBASE_* variables for authentication
+- OPENAI_API_KEY: For AI-powered summarization
+- OPENAI_MODEL/FALLBACK_MODEL: GPT model selection
+
+## API Structure
+tRPC routers in packages/server/src/router/:
+- auth.router.ts: Authentication endpoints
+- user.router.ts: User profile management
+- content.router.ts: Content aggregation and management
+
+## Frontend Routes
+Main views in packages/client/src/views/:
+- Authentication: Login, signup
+- Dashboard: Content timeline
+- Sources: Source management
+- Profile: User settings
+
+## Technology Stack
+- **Frontend**: React, TypeScript, TailwindCSS
+- **Backend**: Node.js, Express, TypeScript, tRPC
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: Firebase Authentication
+- **Testing**: Jest, ts-jest, jest-mock-extended
+- **Deployment**: Docker, Docker Compose
+
+## Testing Strategy
+- Repository layer: 100% coverage with direct Prisma mocks
+- Service layer: Behavioral testing focusing on outputs
+- Auth/Context: Firebase mocking with custom mock classes
+- Router layer: Handler function testing with request/response mocks
+- Coverage thresholds: 75% for critical lib code, 10% global minimum
+
+## Common Commands
+
+### Development
+```bash
+# Start development environment (hot reload)
+npm run dev
+
+# Start server only
+npm run dev:server
+
+# Start client only
+npm run dev:client
+```
+
+### Testing
+```bash
+# Run all server tests
+npm run test:server
+
+# Run specific server test
+npm run test:server -- src/tests/path/to/test.ts
+
+# Run client tests
+npm run test:client
+```
+
+### Database
+```bash
+# Generate Prisma client after schema changes
+npx prisma generate
+
+# Create and apply migrations
+npx prisma migrate dev
+
+# Reset database (development only)
+npx prisma migrate reset
+```
+
+### Docker
+```bash
+# Start all services
+docker-compose up
+
+# Rebuild containers
+docker-compose up --build
+
+# Stop all services
+docker-compose down
+```
+
+## CI/CD
+- GitHub Actions for CI/CD pipeline
+- Automatic testing on pull requests
+- Deployment to production on merge to main branch

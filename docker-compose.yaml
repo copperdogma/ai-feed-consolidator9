@@ -53,6 +53,10 @@ services:
     ports:
       - '${VITE_CLIENT_PORT}:${VITE_CLIENT_PORT}'
     volumes:
-      - ./packages/client:/app
-      - /app/node_modules
+      - ./packages/client/src:/app/src
+      - ./packages/client/public:/app/public
+      - ./packages/client/index.html:/app/index.html
+      - ./packages/client/tsconfig.json:/app/tsconfig.json
+      - ./packages/client/tsconfig.node.json:/app/tsconfig.node.json
+      - ./packages/client/vite.config.ts:/app/vite.config.ts
       - ./.env:/app/.env

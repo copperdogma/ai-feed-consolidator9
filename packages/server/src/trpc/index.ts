@@ -1,5 +1,5 @@
 import { TRPCError, initTRPC } from '@trpc/server'
-import { Context } from 'lib/context'
+import { Context } from '../lib/context'
 import superjson from 'superjson'
 
 const t = initTRPC.context<Context>().create({

@@ -152,4 +152,13 @@ export class ContentRepositoryImpl extends BaseRepositoryImpl<Content, string> i
       },
     }) as Promise<Content[]>;
   }
+
+  /**
+   * Get the repository with a transaction client
+   * @param tx Transaction client
+   * @returns Repository with transaction client
+   */
+  withTransaction(tx: any): ContentRepository {
+    return new ContentRepositoryImpl(tx);
+  }
 } 

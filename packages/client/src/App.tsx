@@ -8,6 +8,8 @@ import NotFound from 'components/NotFound'
 import ProtectedRoute from 'components/ProtectedRoute'
 import { AuthProvider } from './hooks/useAuth'
 import { trpc } from './lib/trpc'
+import ProfilePage from 'views/Profile/ProfilePage'
+import Navigation from 'components/Navigation'
 
 function App() {
   const { queryClient, trpcClient } = useQueryTrpcClient()
@@ -18,10 +20,59 @@ function App() {
         <AuthProvider>
           <Router>
             <Routes>
-              <Route path="/" element={<ProtectedRoute element={Home} />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/todo" element={<ProtectedRoute element={ToDo} />} />
-              <Route path="*" element={<ProtectedRoute element={NotFound} />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute
+                    element={(props) => (
+                      <>
+                        <Navigation />
+                        <Home {...props} />
+                      </>
+                    )}
+                  />
+                }
+              />
+              <Route
+                path="/todo"
+                element={
+                  <ProtectedRoute
+                    element={(props) => (
+                      <>
+                        <Navigation />
+                        <ToDo {...props} />
+                      </>
+                    )}
+                  />
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute
+                    element={(props) => (
+                      <>
+                        <Navigation />
+                        <ProfilePage {...props} />
+                      </>
+                    )}
+                  />
+                }
+              />
+              <Route
+                path="*"
+                element={
+                  <ProtectedRoute
+                    element={(props) => (
+                      <>
+                        <Navigation />
+                        <NotFound {...props} />
+                      </>
+                    )}
+                  />
+                }
+              />
             </Routes>
           </Router>
         </AuthProvider>

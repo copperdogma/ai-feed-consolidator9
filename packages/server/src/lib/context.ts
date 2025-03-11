@@ -30,8 +30,33 @@ export const createContext = async ({
               firebaseUid: decodedToken.uid,
               email: decodedToken.email || '',
               name: decodedToken.name || decodedToken.email?.split('@')[0] || '',
+              avatar: decodedToken.picture || null,
             }
           });
+        } else {
+          // Update user info if Firebase has newer information
+          const needsUpdate = (
+            (decodedToken.name && user.name !== decodedToken.name) ||
+            (decodedToken.email && user.email !== decodedToken.email) ||
+            (decodedToken.picture && user.avatar !== decodedToken.picture)
+          );
+          
+          if (needsUpdate) {
+            // Update user with new information from Firebase
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                name: decodedToken.name || undefined,
+                email: decodedToken.email || undefined,
+                avatar: decodedToken.picture || undefined,
+              }
+            });
+            
+            // Fetch the updated user
+            user = await prisma.user.findUnique({
+              where: { id: user.id }
+            }) || user;
+          }
         }
         
         return user;

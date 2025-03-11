@@ -20,6 +20,7 @@ This document is used to guide project planning, management, and execution
 ---
 
 ## File Layout
+- `/.cursor/rules/project-reference-mdc`: Overview of project structure, technology, and commands. Update succinctly and frequently.
 - `/docs`:  
   - [requirements.md](mdc:docs/requirements.md): Defines project requirements. Formatting guidelines in `/docs/templates/requirements-template.md` 
   - `design.md`: Outlines design details. Formatting guidelines in `/docs/templates/design-template.md`

@@ -4,7 +4,11 @@ WORKDIR /app
 # Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
-RUN npm install --save firebase
+
+# Install Material UI dependencies explicitly to ensure they're properly installed
+RUN npm install --save @mui/material @mui/icons-material @emotion/react @emotion/styled
+# Verify installation
+RUN ls -la /app/node_modules/@mui
 
 # Copy the tsconfig.json and vite config files
 COPY tsconfig.json ./
