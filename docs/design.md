@@ -95,12 +95,126 @@ This architecture allows for a Docker-based deployment (either locally or on fly
   - Detailed summary for deeper understanding
 - Store summaries in database to avoid regeneration
 - Implement fallback to GPT-3.5-turbo for cost optimization
+- Utilize structured JSON output for standardized processing and storage
+- Implement content type detection with specialized prompting per type
+- Include time sensitivity flagging
+- Extract background knowledge requirements
+- Apply "Answer-Forward Testing" methodology to ensure summaries address obvious follow-up questions
 
 #### Content Analysis
 - Extract key topics and entities from content
 - Determine time-to-consume estimates based on content type and length
+  - Calculate reading time based on word count (250 words per minute standard)
+  - Extract video/audio duration for media content
+  - Handle mixed content types with composite calculation
 - Detect content complexity and flag when content is too complex for brief summary
 - Cache analysis results to minimize API costs
+- Implement automated quality testing using more capable models to evaluate summaries
+
+#### Summary Response Schema
+```typescript
+interface SummaryResponse {
+  summary: string;                // 1-3 sentences, max 50 words
+  content_type: 'technical' | 'news' | 'analysis' | 'tutorial' | 'entertainment';
+  time_sensitive: boolean;
+  requires_background: string[];  // Required knowledge areas, empty array if none
+  consumption_time: {
+    minutes: number;              // Time to read/watch/listen (no comprehension time)
+    type: 'read' | 'watch' | 'listen' | 'mixed';
+  };
+}
+```
+
+#### Content Type-Specific Prompting
+Different content types require tailored prompting strategies:
+
+- **Technical Content**:
+  - What new approach/technology is presented?
+  - How does it improve on existing solutions?
+  - What background knowledge is needed?
+
+- **News Content**:
+  - What exactly changed/happened?
+  - Who is affected and how?
+  - When does it take effect?
+
+- **Analysis Content**:
+  - What main argument/conclusion is presented?
+  - Based on what evidence?
+  - What are the key assumptions?
+
+- **Tutorial Content**:
+  - What will the user learn?
+  - What prerequisites are needed?
+  - What are the practical applications?
+
+- **Entertainment Content**:
+  - Format and style (no spoilers)
+  - Genre/category
+  - Time investment required
+
+#### Time-to-Consume Calculation
+Implement specialized calculators for different content types:
+
+- Text content: Word count ÷ average reading speed (250 words/minute)
+- Video content: Extract duration from metadata
+- Audio content: Extract duration from metadata
+- Mixed content: Combine calculations proportionally
+
+#### Answer-Forward Testing
+A validation methodology ensuring summaries preemptively answer the obvious follow-up questions they raise:
+
+1. Identify natural questions that arise from the summary
+2. Verify the summary includes concise answers to those questions
+3. Ensure no critical information is omitted
+
+#### Quality Testing Framework
+Implement an automated quality evaluation system:
+
+- Use more capable models (GPT-4) to evaluate summaries produced by faster/cheaper models (GPT-3.5)
+- Assess summaries against criteria like completeness, accuracy, and conciseness
+- Track metrics like answer completeness, information density, and error rates
+- Create a continuous improvement loop by refining prompts based on evaluation results
+
+#### Deep Analysis Integration
+The application offers a third level of content analysis through direct ChatGPT integration:
+
+- **Implementation Approach**: 
+  ```typescript
+  const gptAnalyze = (item: FeedItem) => {
+    const prompt = `Analyze ${item.url}
+
+  Please search the web and provide:
+  1. Main arguments and key findings
+  2. Supporting evidence and data
+  3. Context and implications
+  4. Notable quotes or statements
+  5. Technical details or methodologies
+  6. Critical evaluation`;
+
+    const encodedPrompt = encodeURIComponent(prompt);
+    const chatGPTUrl = `https://chat.openai.com/?q=${encodedPrompt}`;
+    window.open(chatGPTUrl, '_blank');
+  };
+  ```
+
+- **Three-Tier Analysis System**:
+  1. Quick Summary (1-3 sentences): For rapid content evaluation
+  2. Detailed Summary: For deeper understanding without leaving the app
+  3. gptAnalyze: For comprehensive analysis leveraging ChatGPT's capabilities
+
+- **Content-Type Specific Analysis Prompts**:
+  - Technical content: Focus on methodologies, innovations, and implications
+  - News content: Emphasize context, stakeholders, and broader impact
+  - Analysis content: Focus on arguments, evidence, and alternative perspectives
+  - Tutorial content: Highlight methodologies, prerequisites, and applications
+  - Entertainment content: Focus on themes, style, and critical reception
+
+- **User Experience Considerations**:
+  - Opens in new tab to preserve current application context
+  - Zero additional API costs (leverages user's ChatGPT access)
+  - Complements internal summary features
+  - User-initiated for on-demand deep analysis
 
 ### Feature: Content Organization
 **Related Requirement**: Content Organization in requirements.md
@@ -174,6 +288,210 @@ This architecture allows for a Docker-based deployment (either locally or on fly
 - Encrypt sensitive data in the database
 - Set up proper CORS policies
 - Implement rate limiting for API endpoints
+
+## Error Handling Framework
+The application implements a robust error handling framework to ensure reliability and resilience:
+
+### Error Categorization
+- **Network Errors**: Connection issues, timeouts, DNS failures
+- **Authentication Errors**: Invalid credentials, expired tokens
+- **Authorization Errors**: Insufficient permissions
+- **Validation Errors**: Invalid input, schema violations
+- **Resource Errors**: Not found, already exists, conflict
+- **External Service Errors**: Third-party API failures
+- **Internal Errors**: Unexpected application errors
+
+### Error Handling Pattern
+The application uses a consistent error handling pattern across all components:
+
+```typescript
+async function safeOperation() {
+  try {
+    // Attempt the operation
+    const result = await performOperation();
+    
+    // Verify result integrity
+    if (!result || !result.data) {
+      logger.warn('Operation returned incomplete data', { result });
+      return getDefaultValue();
+    }
+    
+    return processResult(result);
+  } catch (error) {
+    // Log detailed error information
+    logger.error('Operation failed', { 
+      error, 
+      operation: 'performOperation',
+      context: getCurrentContext()
+    });
+    
+    // Handle specific error types
+    if (error instanceof DatabaseError) {
+      await reconnectDatabase();
+      return getDefaultValue();
+    }
+    
+    // Return sensible default for other errors
+    return getDefaultValue();
+  }
+}
+```
+
+### Recovery Strategies
+- **Retry with Exponential Backoff**: For transient errors
+- **Circuit Breaker Pattern**: For persistent external service failures
+- **Graceful Degradation**: Fall back to simpler functionality
+- **Default Values**: Return sensible defaults when operations fail
+- **User Notification**: Inform users of non-recoverable errors
+
+## Feed Health Monitoring
+The application implements comprehensive feed health tracking to ensure reliable content integration:
+
+### Feed Health Interface
+```typescript
+interface FeedHealth {
+  lastCheckAt: Date;
+  consecutiveFailures: number;
+  lastErrorCategory: string;
+  lastErrorDetail: string;
+  isPermananentlyInvalid: boolean;
+  requiresSpecialHandling: boolean;
+  specialHandlerType?: string;
+}
+```
+
+### Feed Validation Pipeline
+The application uses a multi-stage validation pipeline for feed sources:
+```
+Input Feed URL
+↓
+DNS Resolution Check
+↓
+HTTP Status Validation
+↓
+Content Type Verification
+↓
+XML/RSS Format Validation
+↓
+Feed-Specific Handler (if needed)
+↓
+Content Extraction
+```
+
+### Feed Error Categories
+- **HTTP Status Errors**: 404 (Not Found), 403 (Forbidden), 410 (Gone)
+- **Certificate/SSL Issues**: Invalid certificates, hostname mismatches
+- **Feed Format/Parsing Issues**: Invalid XML, unrecognized feed format
+- **Duplicate Entry Issues**: Constraint violations
+- **Network/Connection Issues**: Timeouts, connection resets
+- **XML Parsing Errors**: Invalid characters, malformed structure
+
+### Retry Strategies
+- Implement graduated retry intervals based on failure patterns
+- Use source-specific handlers for problematic feeds
+- Track error patterns for feed categorization
+- Auto-disable feeds after persistent failures
+
+## Structured Logging System
+The application implements a comprehensive logging strategy for improved observability and debugging:
+
+### Logger Implementation
+- Centralized logger configuration in a dedicated module
+- Multi-target output (console and file)
+- Structured JSON logging with pretty printing for development
+- Environment-specific configuration via environment variables
+
+### Logger Configuration
+```typescript
+{
+  level: process.env.LOG_LEVEL || 'info',
+  transport: {
+    targets: [
+      {
+        target: 'pino-pretty',  // Console output for development
+        options: {
+          colorize: true,
+          translateTime: 'SYS:standard',
+          ignore: 'pid,hostname'
+        }
+      },
+      {
+        target: 'pino/file',    // File output for persistence
+        options: { 
+          destination: './logs/app.log',
+          mkdir: true
+        }
+      }
+    ]
+  }
+}
+```
+
+### Log Categories
+- **Authentication**: Login, logout, session management
+- **Database**: Queries, connections, transactions
+- **API**: Requests, responses, errors
+- **Content**: Feed fetching, processing, summarization
+- **System**: Application lifecycle, configuration
+- **Error**: Detailed error information
+
+### Log Levels
+- **trace**: Detailed debugging information
+- **debug**: Debugging information for development
+- **info**: General operational information
+- **warn**: Warnings and potential issues
+- **error**: Error conditions
+- **fatal**: Critical errors requiring immediate attention
+
+## Verification Methodologies
+The application implements comprehensive verification and testing methodologies:
+
+### Log-Based Verification
+- Verify application behavior through log analysis
+- Use structured logging for easier debugging
+- Include context information in logs for better troubleshooting
+- Add debug logs for complex operations
+
+### Multi-Level Testing
+- **Unit Tests**: Individual component testing
+- **Integration Tests**: Component interaction testing
+- **End-to-End Tests**: Complete workflow testing
+- **Test both success and failure scenarios**
+- **Edge case and boundary condition testing**
+
+### Test Environment Management
+- Reset test environment between test runs
+- Use proper database cleanup procedures
+- Manage test data to avoid test interference
+- Environment-specific configuration
+
+### Continuous Verification
+- Run tests automatically on code changes
+- Monitor application logs in development and production
+- Implement health checks for critical components
+- Set up alerts for unexpected behavior
+
+### Verification Workflow
+```bash
+# Clear logs before starting
+echo "" > logs/app.log
+
+# Start the application
+npm run dev &
+
+# Wait for application to initialize
+sleep 5
+
+# Check logs for errors
+grep -i error logs/app.log
+
+# Verify expected behavior
+grep -i "Server listening" logs/app.log
+grep -i "Connected to database" logs/app.log
+
+# Monitor ongoing operations
+tail -f logs/app.log
+```
 
 ## Project Structure
 
