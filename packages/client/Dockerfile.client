@@ -7,8 +7,14 @@ RUN npm install
 
 # Install Material UI dependencies explicitly to ensure they're properly installed
 RUN npm install --save @mui/material @mui/icons-material @emotion/react @emotion/styled
+
+# Install additional dependencies that are critical for the app
+RUN npm install --save react-hot-toast axios
+
 # Verify installation
 RUN ls -la /app/node_modules/@mui
+RUN ls -la /app/node_modules/react-hot-toast
+RUN ls -la /app/node_modules/axios
 
 # Copy the tsconfig.json and vite config files
 COPY tsconfig.json ./

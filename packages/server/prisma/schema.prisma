@@ -12,48 +12,17 @@ generator zod {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// Enum definitions
-enum SourceType {
-  RSS
-  YOUTUBE
-  TWITTER
-  EMAIL
-}
-
-enum ContentStatus {
-  UNREAD
-  READ
-  ARCHIVED
-  DELETED
-}
-
-enum ContentPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-// Core models
 model User {
   id          String    @id @default(uuid())
   email       String    @unique
   name        String?
+  password    Password?
   firebaseUid String?   @unique
   avatar      String?
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  // Relations
-  password    Password?
-  sources     Source[]
-  activities  Activity[]
 }
 
 model Password {
@@ -62,100 +31,4 @@ model Password {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Todo {
-  id          String   @id
-  title       String
-  isCompleted Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime
-}
-
-model Source {
-  id            String      @id @default(uuid())
-  name          String
-  url           String
-  sourceType    SourceType
-  userId        String
-  icon          String?
-  isActive      Boolean     @default(true)
-  refreshRate   Int         @default(60) // minutes
-  lastFetched   DateTime?
-  settings      Json?       // Source-specific settings
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  
-  // Relations
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  contents      Content[]
-}
-
-model Content {
-  id            String           @id @default(uuid())
-  title         String
-  url           String?
-  contentText   String?          // Full content text
-  contentHtml   String?          // HTML version if available
-  sourceId      String
-  author        String?
-  publishedAt   DateTime
-  status        ContentStatus    @default(UNREAD)
-  priority      ContentPriority  @default(MEDIUM)
-  metadata      Json?            // Platform-specific metadata
-  isDeleted     Boolean          @default(false)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  
-  // Relations
-  source        Source           @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-  summary       Summary?
-  activities    Activity[]
-  contentTopics ContentTopic[]
-}
-
-model Summary {
-  id            String    @id @default(uuid())
-  contentId     String    @unique
-  summaryText   String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
-  // Relations
-  content       Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
-}
-
-model Topic {
-  id            String          @id @default(uuid())
-  name          String          @unique
-  description   String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  
-  // Relations
-  contentTopics ContentTopic[]
-}
-
-model ContentTopic {
-  contentId     String
-  topicId       String
-  assignedAt    DateTime  @default(now())
-  
-  // Relations
-  content       Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  topic         Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  
-  // Composite primary key
-  @@id([contentId, topicId])
-}
-
-model Activity {
-  id            String    @id @default(uuid())
-  userId        String
-  contentId     String?
-  action        String    // e.g., "read", "archive", "mark_priority"
-  details       Json?     // Additional details about the activity
-  createdAt     DateTime  @default(now())
-  
-  // Relations
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  content       Content?  @relation(fields: [contentId], references: [id], onDelete: SetNull)
-}
+// Todo model has been removed as it was part of the framework template and not needed

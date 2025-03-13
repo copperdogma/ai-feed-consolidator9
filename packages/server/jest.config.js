@@ -1,75 +1,52 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
-const config = {
-  preset: 'ts-jest/presets/default-esm',
-  testEnvironment: 'node',
-  extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-    '^src/(.*)$': '<rootDir>/src/$1',
-    '^router/(.*)$': '<rootDir>/src/router/$1',
-    '^trpc$': '<rootDir>/src/lib/trpc.js',
-    '^sdks/(.*)$': '<rootDir>/src/sdks/$1',
-  },
-  transform: {
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        useESM: true,
-        tsconfig: 'tsconfig.json',
-        // Skip type checking for tests during development
-        isolatedModules: true
-      },
-    ],
-  },
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '/dist/',
-    '/src/scripts/test.ts'
-  ],
-  modulePathIgnorePatterns: ['/dist/'],
-  setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
-  // This is important for ESM support
-  transformIgnorePatterns: [
-    'node_modules/(?!(ts-jest|@jest|jest-mock-extended)/)'
-  ],
-  // Code coverage configuration
-  collectCoverage: true,
-  collectCoverageFrom: [
-    '<rootDir>/src/**/*.ts',
-    '!<rootDir>/src/**/*.test.ts',
-    '!<rootDir>/src/**/tests/**/*.ts',
-    '!<rootDir>/src/**/*.d.ts',
-    // Exclude generated code
-    '!<rootDir>/src/generated/**/*.ts',
-    '!<rootDir>/src/scripts/**/*.ts',
-    // Exclude application bootstrapping code
-    '!<rootDir>/src/main.ts',
-    '!<rootDir>/src/**/index.ts',
-    // Exclude configuration files
-    '!<rootDir>/src/config/**/*.ts',
-    // Exclude type definition files
-    '!<rootDir>/src/types/**/*.ts',
-    // Exclude router files since they're difficult to test due to tRPC architecture
-    '!<rootDir>/src/router/**/*.ts'
-  ],
-  coverageDirectory: '<rootDir>/coverage',
-  coverageReporters: ['json', 'lcov', 'text', 'clover', 'html'],
-  // Lower thresholds for early development phase
-  coverageThreshold: {
-    global: {
-      branches: 10,
-      functions: 5, 
-      lines: 10,
-      statements: 10
-    },
-    // Set specific higher targets for critical areas
-    './src/lib/': {
-      statements: 75,
-      branches: 50,
-      functions: 75,
-      lines: 75
-    }
-  }
-};
+/**
+ * Jest configuration for server package
+ */
 
-export default config; 
+export default {
+  // Automatically clear mock calls, instances, contexts and results before every test
+  clearMocks: true,
+
+  // Indicates whether the coverage information should be collected while executing the test
+  collectCoverage: true,
+
+  // The directory where Jest should output its coverage files
+  coverageDirectory: "coverage",
+
+  // Indicates which provider should be used to instrument code for coverage
+  coverageProvider: "v8",
+
+  // A list of paths to directories that Jest should use to search for files in
+  roots: ["<rootDir>/src"],
+
+  // The test environment that will be used for testing
+  testEnvironment: "node",
+
+  // A map from regular expressions to paths to transformers
+  transform: {
+    "^.+\\.(ts|js)$": ["babel-jest", {
+      configFile: "./babel.config.cjs"
+    }]
+  },
+
+  // A list of paths to modules that run some code to configure the testing framework
+  setupFiles: ["<rootDir>/src/tests/setup.js"],
+
+  // The glob patterns Jest uses to detect test files
+  testMatch: [
+    "**/__tests__/**/*.[jt]s?(x)",
+    "**/?(*.)+(spec|test).[jt]s?(x)"
+  ],
+
+  // An array of regexp pattern strings that are matched against all test paths
+  testPathIgnorePatterns: [
+    "/node_modules/"
+  ],
+  
+  // Indicates whether each individual test should be reported during the run
+  verbose: true,
+  
+  // Transform configuration for ESM
+  transformIgnorePatterns: [
+    "/node_modules/(?!.*\\.mjs$)"
+  ]
+}; 

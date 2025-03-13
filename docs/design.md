@@ -310,3 +310,19 @@ Authentication is handled using Firebase Authentication, with the following feat
 3. The token is passed to the server with each API request
 4. The server verifies the token using Firebase Admin SDK
 5. Resources are only accessible to authenticated users
+
+## Database Configuration
+
+The application uses three different databases for different environments:
+
+- Development: `ai-feed-consolidator-dev` on local PostgreSQL
+- Testing: `ai-feed-consolidator-test` on local PostgreSQL
+- Production: `ai-feed-consolidator-prod` on local PostgreSQL (or managed service)
+
+All databases use the same schema defined in Prisma but are kept separate to prevent development and testing from affecting production data.
+
+Connection to these databases is configured in the .env files:
+- For Docker containers: Using `host.docker.internal` to access the host machine's PostgreSQL
+- For local development: Using `localhost` to access PostgreSQL directly
+
+The database schema is managed through Prisma ORM with migrations tracked in the repository.

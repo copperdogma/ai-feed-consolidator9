@@ -40,8 +40,9 @@ AI Feed Consolidator Application
 - **Database Schema**: Normalized schema with proper relationships
 - **Custom Port (5433)**: To avoid conflicts with other PostgreSQL instances
 - **Environment Configuration**:
-  - Development: `ai_feed_consolidator` database on local PostgreSQL instance
-  - Testing: `ai_feed_test` database on local PostgreSQL instance
+  - Development: `ai-feed-consolidator-dev` database on local PostgreSQL instance
+  - Testing: `ai-feed-consolidator-test` database on local PostgreSQL instance
+  - Production: `ai-feed-consolidator-prod` database on local PostgreSQL instance (or managed service)
 - **Connection**: Application connects to local PostgreSQL from Docker containers
 
 ### Integration Architecture

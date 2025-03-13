@@ -12,12 +12,15 @@ const ProfileAvatar = styled(Avatar)(({ theme }) => ({
 }));
 
 export default function ProfilePage() {
-  const { currentUser } = useAuth();
+  const { currentUser, testUserCreation } = useAuth();
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [testingUserCreation, setTestingUserCreation] = useState(false);
+  const [userCreationSuccess, setUserCreationSuccess] = useState(false);
+  const [userCreationError, setUserCreationError] = useState<string | null>(null);
 
   // Get user profile from the server
   const { data: profileData, isLoading, refetch } = trpc.user.getProfile.useQuery(undefined, {
@@ -64,6 +67,30 @@ export default function ProfilePage() {
     setIsEditing(true);
   };
 
+  // Test user creation
+  const handleTestUserCreation = async () => {
+    setTestingUserCreation(true);
+    setUserCreationSuccess(false);
+    setUserCreationError(null);
+    
+    try {
+      const result = await testUserCreation();
+      if (result) {
+        setUserCreationSuccess(true);
+        setTimeout(() => setUserCreationSuccess(false), 3000);
+        refetch(); // Refetch user data to show the updated profile
+      } else {
+        setUserCreationError('Failed to create user record');
+        setTimeout(() => setUserCreationError(null), 5000);
+      }
+    } catch (error) {
+      setUserCreationError((error as Error)?.message || 'An error occurred');
+      setTimeout(() => setUserCreationError(null), 5000);
+    } finally {
+      setTestingUserCreation(false);
+    }
+  };
+
   // Update Firebase display name when user profile changes
   useEffect(() => {
     if (currentUser && profileData?.name && currentUser.displayName !== profileData.name) {
@@ -87,6 +114,8 @@ export default function ProfilePage() {
         <CardContent>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           {success && <Alert severity="success" sx={{ mb: 2 }}>Profile updated successfully!</Alert>}
+          {userCreationError && <Alert severity="error" sx={{ mb: 2 }}>{userCreationError}</Alert>}
+          {userCreationSuccess && <Alert severity="success" sx={{ mb: 2 }}>User record created successfully!</Alert>}
           
           <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
             <ProfileAvatar
@@ -130,7 +159,15 @@ export default function ProfilePage() {
               </Box>
             </Stack>
           ) : (
-            <Box display="flex" justifyContent="flex-end">
+            <Box display="flex" justifyContent="space-between">
+              <Button 
+                variant="outlined" 
+                color="warning" 
+                onClick={handleTestUserCreation}
+                disabled={testingUserCreation}
+              >
+                {testingUserCreation ? 'Testing...' : 'Test User Creation'}
+              </Button>
               <Button variant="contained" onClick={handleEdit}>
                 Edit Profile
               </Button>

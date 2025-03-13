@@ -16,15 +16,13 @@ export interface AppRouter extends AnyRouter {
   createCaller: any;
   getErrorShape: any;
   router: {
-    todo: {
-      list: any;
-      add: any;
-      edit: any;
-      delete: any;
-    };
     auth: {
       register: any;
       login: any;
+    };
+    user: {
+      getProfile: any;
+      updateProfile: any;
     };
   };
 }

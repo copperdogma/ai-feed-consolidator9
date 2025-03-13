@@ -20,9 +20,6 @@ const Navigation = () => {
         <Link to="/" style={{ textDecoration: 'none', marginRight: 16 }}>
           <Button appearance="minimal">Home</Button>
         </Link>
-        <Link to="/todo" style={{ textDecoration: 'none', marginRight: 16 }}>
-          <Button appearance="minimal">Todo</Button>
-        </Link>
       </Pane>
       
       <Pane display="flex" alignItems="center">

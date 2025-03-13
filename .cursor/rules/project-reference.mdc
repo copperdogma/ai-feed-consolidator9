@@ -50,10 +50,18 @@ Core entities in `packages/server/prisma/schema.prisma`:
 - Time-to-consume estimates for content items
 
 ## Key Environment Variables
-- DATABASE_URL: PostgreSQL connection string
-- FIREBASE_* variables for authentication
-- OPENAI_API_KEY: For AI-powered summarization
-- OPENAI_MODEL/FALLBACK_MODEL: GPT model selection
+- **Database URLs**: 
+  - `DATABASE_URL`: Development database (ai-feed-consolidator-dev)
+  - `TEST_DATABASE_URL`: Testing database (ai-feed-consolidator-test)
+  - `PROD_DATABASE_URL`: Production database (ai-feed-consolidator-prod)
+- **Firebase Auth**:
+  - `FIREBASE_PROJECT_ID`: Firebase project identifier
+  - `FIREBASE_CLIENT_EMAIL`: Service account email
+  - `FIREBASE_PRIVATE_KEY`: Authentication key
+- **AI Services**:
+  - `OPENAI_API_KEY`: For AI-powered summarization
+  - `OPENAI_MODEL`: Primary GPT model to use
+  - `FALLBACK_MODEL`: Backup model if primary is unavailable
 
 ## API Structure
 tRPC routers in packages/server/src/router/:
@@ -74,7 +82,7 @@ Main views in packages/client/src/views/:
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Firebase Authentication
 - **Testing**: Jest, ts-jest, jest-mock-extended
-- **Deployment**: Docker, Docker Compose
+- **Deployment**: Docker, Docker Compose, but hot reloading is active so most changes don't require Docker rebuilds
 
 ## Testing Strategy
 - Repository layer: 100% coverage with direct Prisma mocks
@@ -119,6 +127,9 @@ npx prisma migrate dev
 
 # Reset database (development only)
 npx prisma migrate reset
+
+# Open Prisma Studio to inspect database
+npx prisma studio
 ```
 
 ### Docker
