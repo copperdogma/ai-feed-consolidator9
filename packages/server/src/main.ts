@@ -8,6 +8,8 @@ import { appRouter } from 'router'
 import cookieParser from 'cookie-parser'
 import prisma from 'sdks/prisma'
 import { auth } from './lib/firebase-admin'
+import { AppStartupService } from './services/app-startup.service'
+import { logger } from './lib/logger'
 
 const VITE_APP_URL = process.env.VITE_APP_URL
 const PORT: number = Number(process.env.SERVER_PORT) || 3001
@@ -312,7 +314,39 @@ app.use(
   })
 )
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on Port ${PORT}`)
-  console.log(`Successfully connected to database`)
+// Server startup
+const server = app.listen(PORT, async () => {
+  logger.info(`🚀 Server running on Port ${PORT}`)
+  logger.info(`Successfully connected to database`)
+  
+  try {
+    // Initialize application services
+    await AppStartupService.initialize({
+      startFeedRefreshService: true,
+      feedRefreshIntervalMinutes: 15 // Check feeds every 15 minutes
+    });
+    logger.info('Application services initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize application services:', error);
+    // Continue running even if background services fail to start
+  }
 })
+
+// Handle graceful shutdown
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM signal received. Shutting down gracefully...');
+  
+  try {
+    // Shutdown application services
+    await AppStartupService.shutdown();
+    
+    // Close server
+    server.close(() => {
+      logger.info('HTTP server closed');
+      process.exit(0);
+    });
+  } catch (error) {
+    logger.error('Error during graceful shutdown:', error);
+    process.exit(1);
+  }
+});

@@ -45,7 +45,7 @@ This document is used to guide project planning, management, and execution
   - Write code following `/docs/architecture.md`, `/docs/design.md`, and `@requirements.md`.  
 - **Progress Tracking**:  
   - Log updates in `@scratchpad.md` under "Progress."  
-  - Reflect status changes in `/docs/stories.md`.  
+  - Reflect status changes in `/docs/stories.md`.
 - **Completion**:  
   - Test the implementation (e.g., run code, verify functionality).  
   - Update the story file with final notes.  

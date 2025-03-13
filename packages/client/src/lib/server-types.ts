@@ -24,6 +24,22 @@ export interface AppRouter extends AnyRouter {
       getProfile: any;
       updateProfile: any;
     };
+    feed: {
+      validateFeedUrl: any;
+      discoverFeeds: any;
+      addFeedSource: any;
+      listFeedSources: any;
+      getFeedSource: any;
+      updateFeedSource: any;
+      deleteFeedSource: any;
+      refreshFeed: any;
+    };
+    admin: {
+      getFeedRefreshStatus: any;
+      startFeedRefreshService: any;
+      stopFeedRefreshService: any;
+      runFeedRefreshCycle: any;
+    };
   };
 }
 

@@ -20,6 +20,9 @@ const Navigation = () => {
         <Link to="/" style={{ textDecoration: 'none', marginRight: 16 }}>
           <Button appearance="minimal">Home</Button>
         </Link>
+        <Link to="/feeds" style={{ textDecoration: 'none', marginRight: 16 }}>
+          <Button appearance="minimal">Feeds</Button>
+        </Link>
       </Pane>
       
       <Pane display="flex" alignItems="center">
@@ -30,6 +33,9 @@ const Navigation = () => {
               <Menu.Group>
                 <Link to="/profile" style={{ textDecoration: 'none' }}>
                   <Menu.Item>Profile</Menu.Item>
+                </Link>
+                <Link to="/feeds" style={{ textDecoration: 'none' }}>
+                  <Menu.Item>Manage Feeds</Menu.Item>
                 </Link>
               </Menu.Group>
               <Menu.Divider />

@@ -12,6 +12,9 @@
     "test": "npm run reset-test-db && jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "vitest": "vitest run",
+    "vitest:watch": "vitest",
+    "vitest:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit --project tsconfig.json",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
@@ -41,6 +44,7 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.26.0",
     "@typescript-eslint/parser": "^8.26.0",
+    "@vitest/coverage-v8": "^1.3.1",
     "babel-jest": "^29.7.0",
     "eslint": "8",
     "eslint-config-prettier": "^10.1.1",
@@ -52,7 +56,8 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.7.2",
     "typescript": "5.4.3",
-    "typescript-eslint": "^8.26.0"
+    "typescript-eslint": "^8.26.0",
+    "vitest": "^1.6.1"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",
@@ -66,6 +71,7 @@
     "firebase-admin": "^13.2.0",
     "module-alias": "^2.2.3",
     "node-fetch": "^3.3.2",
+    "rss-parser": "^3.13.0",
     "superjson": "^2.2.1",
     "uuid": "^11.1.0",
     "zod": "^3.20.6",

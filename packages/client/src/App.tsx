@@ -8,6 +8,7 @@ import ProtectedRoute from 'components/ProtectedRoute'
 import { AuthProvider } from './hooks/useAuth'
 import { trpc } from './lib/trpc'
 import ProfilePage from 'views/Profile/ProfilePage'
+import FeedManagementPage from 'views/Feeds/FeedManagementPage'
 import Navigation from 'components/Navigation'
 import ConnectionErrorNotification from 'components/ConnectionErrorNotification'
 
@@ -31,6 +32,19 @@ function App() {
                       <>
                         <Navigation />
                         <Home {...props} />
+                      </>
+                    )}
+                  />
+                }
+              />
+              <Route
+                path="/feeds"
+                element={
+                  <ProtectedRoute
+                    element={(props) => (
+                      <>
+                        <Navigation />
+                        <FeedManagementPage {...props} />
                       </>
                     )}
                   />

@@ -23,6 +23,8 @@ model User {
   password    Password?
   firebaseUid String?   @unique
   avatar      String?
+  sources     Source[]
+  activities  Activity[]
 }
 
 model Password {
@@ -31,4 +33,119 @@ model Password {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// Todo model has been removed as it was part of the framework template and not needed
+// Represents a content source (RSS feed, YouTube channel, Twitter feed, etc.)
+model Source {
+  id          String    @id @default(uuid())
+  name        String
+  url         String
+  sourceType  String    // "RSS", "YOUTUBE", "TWITTER", "EMAIL"
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isActive    Boolean   @default(true)
+  icon        String?   // URL to source icon/favicon
+  refreshRate Int       @default(60) // Minutes between refresh
+  lastFetched DateTime? // Last time the source was fetched
+  settings    Json?     // Source-specific settings
+  contents    Content[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([sourceType])
+  @@index([lastFetched])
+}
+
+// Represents content items pulled from sources
+model Content {
+  id           String         @id @default(uuid())
+  title        String
+  url          String         @unique
+  sourceId     String
+  source       Source         @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  publishedAt  DateTime
+  contentText  String?        @db.Text
+  contentHtml  String?        @db.Text
+  author       String?
+  status       ContentStatus  @default(UNREAD)
+  priority     ContentPriority @default(MEDIUM)
+  isDeleted    Boolean        @default(false)
+  metadata     Json?
+  summary      Summary?
+  topics       ContentTopic[]
+  activities   Activity[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([sourceId])
+  @@index([status])
+  @@index([priority])
+  @@index([publishedAt])
+}
+
+// AI-generated summary of content
+model Summary {
+  id          String    @id @default(uuid())
+  contentId   String    @unique
+  content     Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  summaryText String    @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([contentId])
+}
+
+// Content topic/category
+model Topic {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  description String?       @db.Text
+  contents    ContentTopic[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+// Many-to-many relationship between Content and Topic
+model ContentTopic {
+  contentId   String
+  content     Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  topicId     String
+  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  assignedAt  DateTime  @default(now())
+
+  @@id([contentId, topicId])
+  @@index([contentId])
+  @@index([topicId])
+}
+
+// User activity log
+model Activity {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contentId String?
+  content   Content?  @relation(fields: [contentId], references: [id], onDelete: SetNull)
+  action    String    // read, archive, mark_priority, share, etc.
+  details   Json?     // Additional details about the activity
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([contentId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// Content status enum
+enum ContentStatus {
+  UNREAD
+  READ
+  ARCHIVED
+  DELETED
+}
+
+// Content priority enum
+enum ContentPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}

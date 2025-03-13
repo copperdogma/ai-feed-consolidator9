@@ -2,7 +2,7 @@ import { Pane, majorScale, Button, Heading, Spinner, toaster, Text, minorScale, 
 import NavBar from 'views/Login/Auth/NavBar'
 import TechStack from 'views/Login/TechStack'
 import { useAuth } from '../../hooks/useAuth'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getIdToken, User as FirebaseUser } from 'firebase/auth'
 
@@ -14,11 +14,12 @@ const Login = () => {
   const [showResults, setShowResults] = useState(false)
   const navigate = useNavigate()
 
-  // Redirect if user is already logged in
-  if (currentUser && !loading) {
-    navigate('/')
-    return null
-  }
+  // Use effect for navigation instead of conditional rendering
+  useEffect(() => {
+    if (currentUser && !loading) {
+      navigate('/')
+    }
+  }, [currentUser, loading, navigate])
 
   // Show loading spinner while checking auth state
   if (loading) {
@@ -34,7 +35,7 @@ const Login = () => {
       setIsLoading(true)
       await signInWithGoogle()
       toaster.success('Successfully signed in with Google!')
-      navigate('/')
+      // Don't navigate here, let the useEffect handle it
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to sign in with Google'
       toaster.danger(message)

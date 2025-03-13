@@ -10,6 +10,7 @@ When creating the `stories.md` file for a new project:
 2. Replace placeholders (e.g., `[PROJECT TITLE]`, `[STORY ID]`) with project-specific information.
 3. Use the "Sample" section as a reference, but tailor the content to the specific project.
 4. Update the "Story List" section as new stories are added or their statuses change.
+5. **Important**: A story can only be marked as "Done" after receiving explicit user sign-off.
 
 ---
 
@@ -20,6 +21,8 @@ When creating the `stories.md` file for a new project:
 [PROJECT TITLE]
 
 **Note**: This document serves as an index for all story files in `/docs/stories/`, tracking their progress and status.
+
+**Process Note**: Stories can only be marked as "Done" after receiving explicit user sign-off confirming all requirements are met.
 
 ---
 
@@ -47,6 +50,8 @@ Task Manager App
 
 **Note**: This document serves as an index for all story files in `/docs/stories/`, tracking their progress and status.
 
+**Process Note**: Stories can only be marked as "Done" after receiving explicit user sign-off confirming all requirements are met.
+
 ---
 
 ## Story List
@@ -57,3 +62,4 @@ Task Manager App
 
 ## Notes
 - Story #001 is delayed due to issues with Google API rate limits.
+- All completed stories require explicit user sign-off before being marked as "Done".

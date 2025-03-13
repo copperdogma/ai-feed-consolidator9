@@ -10,6 +10,7 @@ When creating a new story file in the `/docs/stories` folder:
 2. Fill in the placeholders (e.g., `[FILL IN]`) with story-specific information.
 3. Use the "Sample" section as a reference for how the template can be filled out, but do not copy it directly.
 4. Update the status and tasks as work progresses.
+5. **Important**: A story can only be marked as "Done" after explicit user sign-off is obtained and documented.
 
 ---
 
@@ -38,6 +39,7 @@ When creating a new story file in the `/docs/stories` folder:
 <!-- AI: List the tasks needed to complete this story -->
 - [ ] [TASK 1]
 - [ ] [TASK 2]
+- [ ] **Final User Sign-off**: Obtain explicit user approval confirming all requirements are met and the story can be marked as complete
 
 ## Notes
 <!-- AI: Add any additional notes or considerations -->
@@ -72,6 +74,7 @@ Below is a sample story file for a hypothetical task manager app. Use this as a 
 - [ ] Implement the backend API endpoint for task creation
 - [ ] Connect the form to the backend API
 - [ ] Test the task creation flow
+- [ ] **Final User Sign-off**: Obtain explicit user approval confirming all requirements are met and the story can be marked as complete
 
 ## Notes
 - Ensure that the form validates input before submission.
