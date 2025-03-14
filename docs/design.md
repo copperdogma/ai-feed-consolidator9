@@ -25,7 +25,7 @@ This architecture allows for a Docker-based deployment (either locally or on fly
 - **UI Approach**: Lightweight, responsive components without specific library dependency
 - **State Management**: React Query for API data fetching and caching
 - **Build Tool**: Vite for fast development experience
-- **Testing**: Jest and React Testing Library
+- **Testing**: Vitest and React Testing Library
 
 ### Backend
 - **Framework**: Node.js with Express

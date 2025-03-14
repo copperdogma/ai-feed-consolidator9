@@ -1,16 +1,15 @@
 /**
  * Tests for the UserRepository implementation
+ * (Migrated from Jest to Vitest)
  */
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { UserRepositoryImpl } from '../../repositories/user.repository';
 import { PrismaClient } from '@prisma/client';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+import { mockPrisma } from '../utils/mock-utils';
 
 // Mock the PrismaClient
-type MockPrismaClient = DeepMockProxy<PrismaClient>;
-
 describe('UserRepository', () => {
-  let prisma: MockPrismaClient;
+  let prisma: any;
   let userRepository: UserRepositoryImpl;
   
   // Sample user data for testing
@@ -21,20 +20,21 @@ describe('UserRepository', () => {
     name: 'Test User',
     avatar: 'https://example.com/avatar.jpg',
     role: 'USER',
+    isActive: true,
     createdAt: new Date(),
     updatedAt: new Date()
   };
 
   beforeEach(() => {
     // Create a fresh mock for each test
-    prisma = mockDeep<PrismaClient>();
+    prisma = mockPrisma();
     userRepository = new UserRepositoryImpl(prisma as any);
   });
 
   describe('findById', () => {
     it('should return user when it exists', async () => {
       // Setup the mock to return our sample user
-      prisma.user.findUnique.mockResolvedValue(sampleUser);
+      (prisma.user.findUnique as any).mockResolvedValue(sampleUser);
 
       // Execute the method under test
       const result = await userRepository.findById('user-123');
@@ -50,7 +50,7 @@ describe('UserRepository', () => {
 
     it('should return null when user does not exist', async () => {
       // Setup the mock to return null
-      prisma.user.findUnique.mockResolvedValue(null);
+      (prisma.user.findUnique as any).mockResolvedValue(null);
 
       // Execute the method under test
       const result = await userRepository.findById('non-existent');
@@ -67,7 +67,7 @@ describe('UserRepository', () => {
         { ...sampleUser, id: 'user-1' },
         { ...sampleUser, id: 'user-2', email: 'user2@example.com' }
       ];
-      prisma.user.findMany.mockResolvedValue(users);
+      (prisma.user.findMany as any).mockResolvedValue(users);
 
       // Execute the method under test
       const result = await userRepository.findAll();
@@ -87,7 +87,7 @@ describe('UserRepository', () => {
     it('should return users with pagination', async () => {
       // Setup: Create an array of sample users
       const users = [{ ...sampleUser, id: 'user-2' }];
-      prisma.user.findMany.mockResolvedValue(users);
+      (prisma.user.findMany as any).mockResolvedValue(users);
 
       // Execute the method under test with pagination
       const result = await userRepository.findAll({ skip: 1, take: 1 });
@@ -107,7 +107,7 @@ describe('UserRepository', () => {
     it('should return users with filtering', async () => {
       // Setup: Create filtered users
       const users = [{ ...sampleUser, role: 'ADMIN' }];
-      prisma.user.findMany.mockResolvedValue(users);
+      (prisma.user.findMany as any).mockResolvedValue(users);
 
       // Execute the method under test with filtering
       const result = await userRepository.findAll({ 
@@ -117,7 +117,7 @@ describe('UserRepository', () => {
       // Verify the result
       expect(result).toEqual(users);
       expect(result.length).toBe(1);
-      expect(result[0].role).toBe('ADMIN');
+      expect((result[0] as any).role).toBe('ADMIN');
       
       // Verify that the mock was called with the correct parameters
       expect(prisma.user.findMany).toHaveBeenCalledWith({
@@ -143,10 +143,11 @@ describe('UserRepository', () => {
         ...newUserData,
         id: 'new-user-123', 
         avatar: null,
+        isActive: true,
         createdAt: new Date(),
         updatedAt: new Date() 
       };
-      prisma.user.create.mockResolvedValue(createdUser);
+      (prisma.user.create as any).mockResolvedValue(createdUser);
 
       // Execute the method under test
       const result = await userRepository.create(newUserData);
@@ -175,7 +176,7 @@ describe('UserRepository', () => {
         ...updateData,
         updatedAt: new Date() 
       };
-      prisma.user.update.mockResolvedValue(updatedUser);
+      (prisma.user.update as any).mockResolvedValue(updatedUser);
 
       // Execute the method under test
       const result = await userRepository.update('user-123', updateData);
@@ -194,7 +195,7 @@ describe('UserRepository', () => {
     it('should throw an error when user does not exist', async () => {
       // Setup: Mock to throw an error
       const error = new Error('User not found');
-      prisma.user.update.mockRejectedValue(error);
+      (prisma.user.update as any).mockRejectedValue(error);
 
       // Execute & Verify
       await expect(userRepository.update('non-existent', { name: 'New Name' }))
@@ -205,7 +206,7 @@ describe('UserRepository', () => {
   describe('delete', () => {
     it('should delete user and return true on success', async () => {
       // Setup: Mock the delete method to return the deleted user
-      prisma.user.delete.mockResolvedValue(sampleUser);
+      (prisma.user.delete as any).mockResolvedValue(sampleUser);
 
       // Execute the method under test
       const result = await userRepository.delete('user-123');
@@ -222,7 +223,7 @@ describe('UserRepository', () => {
     it('should return false when deletion fails', async () => {
       // Setup: Mock to throw an error
       const error = new Error('User not found');
-      prisma.user.delete.mockRejectedValue(error);
+      (prisma.user.delete as any).mockRejectedValue(error);
 
       // Execute the method under test
       const result = await userRepository.delete('non-existent');
@@ -240,7 +241,7 @@ describe('UserRepository', () => {
   describe('count', () => {
     it('should return the number of users', async () => {
       // Setup: Mock to return a count
-      prisma.user.count.mockResolvedValue(10);
+      (prisma.user.count as any).mockResolvedValue(10);
 
       // Execute the method under test
       const result = await userRepository.count();
@@ -256,7 +257,7 @@ describe('UserRepository', () => {
 
     it('should return the number of filtered users', async () => {
       // Setup: Mock to return a filtered count
-      prisma.user.count.mockResolvedValue(2);
+      (prisma.user.count as any).mockResolvedValue(2);
 
       // Execute the method under test with filter
       const result = await userRepository.count({ role: 'ADMIN' });
@@ -274,7 +275,7 @@ describe('UserRepository', () => {
   describe('findByEmail', () => {
     it('should return user when email exists', async () => {
       // Setup the mock to return our sample user
-      prisma.user.findUnique.mockResolvedValue(sampleUser);
+      (prisma.user.findUnique as any).mockResolvedValue(sampleUser);
 
       // Execute the method under test
       const result = await userRepository.findByEmail('user@example.com');
@@ -290,7 +291,7 @@ describe('UserRepository', () => {
 
     it('should return null when email does not exist', async () => {
       // Setup the mock to return null
-      prisma.user.findUnique.mockResolvedValue(null);
+      (prisma.user.findUnique as any).mockResolvedValue(null);
 
       // Execute the method under test
       const result = await userRepository.findByEmail('nonexistent@example.com');
@@ -303,7 +304,7 @@ describe('UserRepository', () => {
   describe('findByFirebaseUid', () => {
     it('should return user when Firebase UID exists', async () => {
       // Setup the mock to return our sample user
-      prisma.user.findUnique.mockResolvedValue(sampleUser);
+      (prisma.user.findUnique as any).mockResolvedValue(sampleUser);
 
       // Execute the method under test
       const result = await userRepository.findByFirebaseUid('firebase-uid-123');
@@ -319,7 +320,7 @@ describe('UserRepository', () => {
 
     it('should return null when Firebase UID does not exist', async () => {
       // Setup the mock to return null
-      prisma.user.findUnique.mockResolvedValue(null);
+      (prisma.user.findUnique as any).mockResolvedValue(null);
 
       // Execute the method under test
       const result = await userRepository.findByFirebaseUid('non-existent-uid');
@@ -343,7 +344,7 @@ describe('UserRepository', () => {
         ...profileData,
         updatedAt: new Date() 
       };
-      prisma.user.update.mockResolvedValue(updatedUser);
+      (prisma.user.update as any).mockResolvedValue(updatedUser);
 
       // Execute the method under test
       const result = await userRepository.updateProfile('user-123', profileData);
@@ -372,7 +373,7 @@ describe('UserRepository', () => {
         name: 'Updated Name',
         updatedAt: new Date() 
       };
-      prisma.user.update.mockResolvedValue(updatedUser);
+      (prisma.user.update as any).mockResolvedValue(updatedUser);
 
       // Execute the method under test
       const result = await userRepository.updateProfile('user-123', profileData);
@@ -391,7 +392,7 @@ describe('UserRepository', () => {
     it('should throw an error when user does not exist', async () => {
       // Setup: Mock to throw an error
       const error = new Error('User not found');
-      prisma.user.update.mockRejectedValue(error);
+      (prisma.user.update as any).mockRejectedValue(error);
 
       // Execute & Verify
       await expect(userRepository.updateProfile('non-existent', { name: 'New Name' }))
@@ -402,7 +403,7 @@ describe('UserRepository', () => {
   describe('withTransaction', () => {
     it('should return a new repository instance with transaction client', () => {
       // Setup: Create a mock transaction client
-      const mockTx = mockDeep<PrismaClient>();
+      const mockTx = mockPrisma();
       
       // Execute the method under test
       const txRepository = userRepository.withTransaction(mockTx);

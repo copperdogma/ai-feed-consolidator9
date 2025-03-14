@@ -5,15 +5,14 @@
  * and verifies that users are properly created in the database.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { signInWithPopup, getIdToken } from 'firebase/auth';
 import axios from 'axios';
 
 // Mock Firebase Auth
-vi.mock('firebase/auth', () => {
+jest.mock('firebase/auth', () => {
   return {
-    getIdToken: vi.fn(() => Promise.resolve('mock-firebase-token-123')),
-    signInWithPopup: vi.fn(() => 
+    getIdToken: jest.fn(() => Promise.resolve('mock-firebase-token-123')),
+    signInWithPopup: jest.fn(() => 
       Promise.resolve({
         user: {
           uid: 'google-user-123',
@@ -24,23 +23,23 @@ vi.mock('firebase/auth', () => {
         }
       })
     ),
-    GoogleAuthProvider: vi.fn(() => ({}))
+    GoogleAuthProvider: jest.fn(() => ({}))
   };
 });
 
 // Mock axios for API calls
-vi.mock('axios');
+jest.mock('axios');
 
 // Mock the useAuth hook
-vi.mock('../../hooks/useAuth', () => {
+jest.mock('../../hooks/useAuth', () => {
   return {
     useAuth: () => ({
-      signInWithGoogle: vi.fn(() => Promise.resolve({
+      signInWithGoogle: jest.fn(() => Promise.resolve({
         uid: 'google-user-123',
         email: 'test@example.com',
         displayName: 'Test User'
       })),
-      testUserCreation: vi.fn(() => Promise.resolve(true)),
+      testUserCreation: jest.fn(() => Promise.resolve(true)),
       loading: false,
       currentUser: null
     })
@@ -52,12 +51,12 @@ import { useAuth } from '../../hooks/useAuth';
 
 describe('Google Authentication Flow', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
   
-  it('signInWithGoogle calls Firebase authentication and creates a user', async () => {
+  test('signInWithGoogle calls Firebase authentication and creates a user', async () => {
     // Configure axios mock response
-    vi.mocked(axios.post).mockResolvedValueOnce({
+    axios.post.mockResolvedValueOnce({
       data: {
         status: 'success',
         user: {
@@ -80,9 +79,9 @@ describe('Google Authentication Flow', () => {
     expect(result.email).toBe('test@example.com');
   });
   
-  it('testUserCreation successfully verifies user creation', async () => {
+  test('testUserCreation successfully verifies user creation', async () => {
     // Configure axios mock response for the test user creation endpoint
-    vi.mocked(axios.post).mockResolvedValueOnce({
+    axios.post.mockResolvedValueOnce({
       data: {
         success: true,
         message: 'User created successfully'
@@ -98,7 +97,7 @@ describe('Google Authentication Flow', () => {
   });
 
   // New test for the fixed authentication flow
-  it('debug-auth endpoint properly saves user to database', async () => {
+  test('debug-auth endpoint properly saves user to database', async () => {
     // Define a real user object similar to what would come from Google auth
     const realUser = {
       uid: 'google-real-user-456',
@@ -108,10 +107,10 @@ describe('Google Authentication Flow', () => {
     };
     
     // Mock the token from Firebase
-    vi.mocked(getIdToken).mockResolvedValueOnce('real-firebase-token-456');
+    getIdToken.mockResolvedValueOnce('real-firebase-token-456');
     
     // Mock the axios POST to debug-auth endpoint
-    vi.mocked(axios.post).mockResolvedValueOnce({
+    axios.post.mockResolvedValueOnce({
       data: {
         status: 'success',
         message: 'Authentication successful',

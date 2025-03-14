@@ -81,15 +81,16 @@ Main views in packages/client/src/views/:
 - **Backend**: Node.js, Express, TypeScript, tRPC
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Firebase Authentication
-- **Testing**: Jest, ts-jest, jest-mock-extended
+- **Testing**: Vitest with custom mock utilities
 - **Deployment**: Docker, Docker Compose, but hot reloading is active so most changes don't require Docker rebuilds
 
 ## Testing Strategy
-- Repository layer: 100% coverage with direct Prisma mocks
+- Repository layer: 100% coverage with custom Prisma mocks (`mockPrisma` utility)
 - Service layer: Behavioral testing focusing on outputs
 - Auth/Context: Firebase mocking with custom mock classes
 - Router layer: Handler function testing with request/response mocks
 - Coverage thresholds: 75% for critical lib code, 10% global minimum
+- Test files use `.test.ts` extension and are automatically discovered by Vitest
 
 ## Common Commands
 
@@ -107,6 +108,9 @@ npm run dev:client
 
 ### Testing
 ```bash
+# Run all tests (server and client)
+npm test
+
 # Run all server tests
 npm run test:server
 
@@ -115,6 +119,9 @@ npm run test:server -- src/tests/path/to/test.ts
 
 # Run client tests
 npm run test:client
+
+# Run test coverage report
+npm run test:coverage
 ```
 
 ### Database
@@ -147,4 +154,4 @@ docker-compose down
 ## CI/CD
 - GitHub Actions for CI/CD pipeline
 - Automatic testing on pull requests
-- Deployment to production on merge to main branch
+- Deployment to production on merge to main branch 

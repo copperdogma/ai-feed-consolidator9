@@ -1,16 +1,13 @@
 /**
  * Tests for the TopicRepository implementation
  */
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TopicRepositoryImpl } from '../../repositories/topic.repository';
 import { PrismaClient } from '@prisma/client';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
-
-// Mock the PrismaClient
-type MockPrismaClient = DeepMockProxy<PrismaClient>;
+import { mockPrisma } from '../utils/mock-utils';
 
 describe('TopicRepository', () => {
-  let prisma: MockPrismaClient;
+  let prisma: any;
   let topicRepository: TopicRepositoryImpl;
   
   // Sample topic data for testing
@@ -24,8 +21,8 @@ describe('TopicRepository', () => {
 
   beforeEach(() => {
     // Create a fresh mock for each test
-    prisma = mockDeep<PrismaClient>();
-    topicRepository = new TopicRepositoryImpl(prisma as any);
+    prisma = mockPrisma();
+    topicRepository = new TopicRepositoryImpl(prisma);
   });
 
   describe('findById', () => {

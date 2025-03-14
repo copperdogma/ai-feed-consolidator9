@@ -1,9 +1,9 @@
 /**
- * Simple test to verify Jest setup is working
+ * Simple test to verify Vitest setup is working
  */
-import { describe, it, expect, jest } from '@jest/globals';
+import { describe, it, expect, vi } from 'vitest';
 
-describe('Jest Setup', () => {
+describe('Vitest Setup', () => {
   it('should work with ESM', () => {
     expect(1 + 1).toBe(2);
   });
@@ -14,7 +14,7 @@ describe('Jest Setup', () => {
   });
 
   it('can use mock functions', () => {
-    const mockFn = jest.fn(() => 'mocked');
+    const mockFn = vi.fn(() => 'mocked');
     const result = mockFn();
     expect(mockFn).toHaveBeenCalled();
     expect(result).toBe('mocked');

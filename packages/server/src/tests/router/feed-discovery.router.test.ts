@@ -5,7 +5,7 @@ import { FeedDiscoveryResult } from '../../services/rss-feed.types';
 import { TRPCError } from '@trpc/server';
 import RepositoryFactory from '../../repositories/repository-factory';
 import { PrismaClient, User } from '@prisma/client';
-import { mockDeep } from 'jest-mock-extended';
+import { mockDeep } from '../utils/mock-utils';
 
 // Mock the repository factory and RssFeedService
 vi.mock('../../repositories/repository-factory');

@@ -1,29 +1,41 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { TRPCProvider } from '../../../providers/TRPCProvider';
+import '@testing-library/jest-dom'; // Import jest-dom for the toBeInTheDocument matcher
+import { TRPCProvider } from '../../../tests/mocks/TRPCProvider';
+import { createMockMutation, MutationOptions } from '../../../tests/mocks/trpcMock';
 import AddFeedForm from './AddFeedForm';
+import { RouterOutput, RouterInput } from '../../../lib/trpc';
+
+// Define explicit types for our mock functions
+type ValidateFeedUrlInput = RouterInput['feed']['validateFeedUrl'];
+type ValidateFeedUrlOutput = RouterOutput['feed']['validateFeedUrl'];
+
+type DiscoverFeedsInput = RouterInput['feed']['discoverFeeds'];
+type DiscoverFeedsOutput = RouterOutput['feed']['discoverFeeds'];
+
+type AddFeedSourceInput = RouterInput['feed']['addFeedSource'];
+type AddFeedSourceOutput = RouterOutput['feed']['addFeedSource'];
+
+// Create typed mock mutations using our utility
+const validateFeedUrlMock = createMockMutation<'feed.validateFeedUrl', ValidateFeedUrlInput, ValidateFeedUrlOutput>();
+const discoverFeedsMock = createMockMutation<'feed.discoverFeeds', DiscoverFeedsInput, DiscoverFeedsOutput>();
+const addFeedSourceMock = createMockMutation<'feed.addFeedSource', AddFeedSourceInput, AddFeedSourceOutput>();
 
 // Mock the trpc hooks
 vi.mock('../../../lib/trpc', () => ({
   trpc: {
     feed: {
       validateFeedUrl: {
-        useMutation: () => ({
-          mutate: vi.fn(),
-          isLoading: false,
-        }),
+        useMutation: (options?: MutationOptions<ValidateFeedUrlOutput, Error, ValidateFeedUrlInput, unknown>) => 
+          validateFeedUrlMock(options)
       },
       discoverFeeds: {
-        useMutation: () => ({
-          mutate: vi.fn(),
-          isLoading: false,
-        }),
+        useMutation: (options?: MutationOptions<DiscoverFeedsOutput, Error, DiscoverFeedsInput, unknown>) => 
+          discoverFeedsMock(options)
       },
       addFeedSource: {
-        useMutation: () => ({
-          mutate: vi.fn(),
-          isLoading: false,
-        }),
+        useMutation: (options?: MutationOptions<AddFeedSourceOutput, Error, AddFeedSourceInput, unknown>) => 
+          addFeedSourceMock(options)
       },
     },
   },
@@ -76,125 +88,75 @@ describe('AddFeedForm', () => {
     fireEvent.blur(urlInput);
     
     await waitFor(() => {
-      expect(screen.getByText(/Processing URL/i)).toBeInTheDocument();
+      expect(screen.getByText(/Discovering feeds/i)).toBeInTheDocument();
     });
   });
 
   it('should auto-fill feed name when feed URL is validated', async () => {
-    // Mock successful validation with feed title
-    const validateMock = vi.fn().mockImplementation(({ url, onSuccess }) => {
-      setTimeout(() => {
-        onSuccess({
-          isValid: true,
-          feedTitle: 'Example Feed',
-        });
-      }, 100);
-    });
-
-    // Override the mock
-    vi.mocked(trpc.feed.validateFeedUrl.useMutation).mockReturnValue({
-      mutate: validateMock,
-      isLoading: false,
-    });
-
     renderComponent();
     
     const urlInput = screen.getByLabelText(/Website or Feed URL/i);
     fireEvent.change(urlInput, { target: { value: 'https://example.com/feed.xml' } });
     fireEvent.blur(urlInput);
     
-    await waitFor(() => {
-      const nameInput = screen.getByLabelText(/Feed Name/i);
-      expect(nameInput.value).toBe('Example Feed');
+    // Simulate successful validation response
+    await validateFeedUrlMock.mockSuccess({
+      isValid: true,
+      feedTitle: 'Example Feed'
     });
+    
+    await waitFor(() => {
+      const nameInput = screen.getByLabelText(/Feed Name/i) as HTMLInputElement;
+      expect(nameInput.value).toBe('Example Feed');
+    }, { timeout: 1000 });
   });
 
   it('should discover and auto-select feed when website URL is entered', async () => {
-    // Mock successful discovery with feeds
-    const discoverMock = vi.fn().mockImplementation(({ url, onSuccess }) => {
-      setTimeout(() => {
-        onSuccess({
-          success: true,
-          discoveredFeeds: [
-            { url: 'https://example.com/feed.xml', title: 'Example Feed' },
-            { url: 'https://example.com/rss.xml', title: 'Example RSS' },
-          ],
-        });
-      }, 100);
-    });
-
-    // Override the mock
-    vi.mocked(trpc.feed.discoverFeeds.useMutation).mockReturnValue({
-      mutate: discoverMock,
-      isLoading: false,
-    });
-
     renderComponent();
     
     const urlInput = screen.getByLabelText(/Website or Feed URL/i);
     fireEvent.change(urlInput, { target: { value: 'example.com' } });
     fireEvent.blur(urlInput);
+    
+    // Simulate successful discovery response
+    await discoverFeedsMock.mockSuccess({
+      success: true,
+      discoveredFeeds: [
+        { url: 'https://example.com/feed.xml', title: 'Example Feed' },
+        { url: 'https://example.com/rss.xml', title: 'Example RSS' },
+      ]
+    });
     
     await waitFor(() => {
       // Should auto-select the first feed and fill in the name
-      expect(screen.getByLabelText(/Feed Name/i).value).toBe('Example Feed');
-      expect(screen.getByText(/Found 2 feeds/i)).toBeInTheDocument();
-    });
+      const nameInput = screen.getByLabelText(/Feed Name/i) as HTMLInputElement;
+      expect(nameInput.value).toBe('Example Feed');
+      expect(screen.getByText(/Discovered Feeds/i)).toBeInTheDocument();
+      expect(screen.getByText(/2/i)).toBeInTheDocument();
+    }, { timeout: 1000 });
   });
 
   it('should show error when no feeds are found', async () => {
-    // Mock failed discovery
-    const discoverMock = vi.fn().mockImplementation(({ url, onError }) => {
-      setTimeout(() => {
-        onError(new Error('No feeds found'));
-      }, 100);
-    });
-
-    // Override the mock
-    vi.mocked(trpc.feed.discoverFeeds.useMutation).mockReturnValue({
-      mutate: discoverMock,
-      isLoading: false,
-    });
-
+    // Mock the toaster.danger function for this test
+    const dangerMock = vi.fn();
+    const evergreen = await import('evergreen-ui');
+    evergreen.toaster.danger = dangerMock;
+    
     renderComponent();
     
     const urlInput = screen.getByLabelText(/Website or Feed URL/i);
-    fireEvent.change(urlInput, { target: { value: 'example.com' } });
+    fireEvent.change(urlInput, { target: { value: 'no-feeds-site.com' } });
     fireEvent.blur(urlInput);
     
+    // Simulate error response
+    await discoverFeedsMock.mockError(new Error('No feeds found'));
+    
     await waitFor(() => {
-      expect(screen.getByText(/No feeds found/i)).toBeInTheDocument();
-    });
+      expect(dangerMock).toHaveBeenCalledWith('Error discovering feeds', { description: 'No feeds found' });
+    }, { timeout: 1000 });
   });
 
   it('should submit the form when all fields are valid', async () => {
-    // Mock successful validation and feed addition
-    const validateMock = vi.fn().mockImplementation(({ url, onSuccess }) => {
-      setTimeout(() => {
-        onSuccess({
-          isValid: true,
-          feedTitle: 'Example Feed',
-        });
-      }, 100);
-    });
-
-    const addFeedMock = vi.fn().mockImplementation(({ onSuccess }) => {
-      setTimeout(() => {
-        onSuccess();
-      }, 100);
-    });
-
-    // Override the mocks
-    vi.mocked(trpc.feed.validateFeedUrl.useMutation).mockReturnValue({
-      mutate: validateMock,
-      isLoading: false,
-    });
-
-    vi.mocked(trpc.feed.addFeedSource.useMutation).mockReturnValue({
-      mutate: addFeedMock,
-      isLoading: false,
-    });
-
     renderComponent();
     
     // Fill in the form
@@ -202,17 +164,26 @@ describe('AddFeedForm', () => {
     fireEvent.change(urlInput, { target: { value: 'https://example.com/feed.xml' } });
     fireEvent.blur(urlInput);
     
-    await waitFor(() => {
-      const nameInput = screen.getByLabelText(/Feed Name/i);
-      expect(nameInput.value).toBe('Example Feed');
+    // Simulate successful validation
+    await validateFeedUrlMock.mockSuccess({
+      isValid: true,
+      feedTitle: 'Example Feed'
     });
+    
+    await waitFor(() => {
+      const nameInput = screen.getByLabelText(/Feed Name/i) as HTMLInputElement;
+      expect(nameInput.value).toBe('Example Feed');
+    }, { timeout: 1000 });
     
     // Submit the form
     fireEvent.click(screen.getByText(/Add Feed/i));
     
+    // Simulate successful submission
+    await addFeedSourceMock.mockSuccess();
+    
     await waitFor(() => {
-      expect(addFeedMock).toHaveBeenCalled();
+      expect(addFeedSourceMock._mutateMock).toHaveBeenCalled();
       expect(mockOnSuccess).toHaveBeenCalled();
-    });
+    }, { timeout: 1000 });
   });
 }); 

@@ -1,13 +1,39 @@
 /**
  * Tests for the user authentication flow in context.ts
+ * (Migrated from Jest to Vitest)
  */
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { createContext } from '../lib/context.js';
-import { auth } from '../lib/firebase-admin.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Request, Response } from 'express';
 
-// Create explicit mocks
-const mockAuthVerifyIdToken = jest.fn();
-auth.verifyIdToken = mockAuthVerifyIdToken;
+// Mock dependencies before importing them
+vi.mock('../lib/firebase-admin', () => ({
+  auth: {
+    verifyIdToken: vi.fn()
+  }
+}));
+
+vi.mock('../sdks/prisma', () => ({
+  default: {
+    user: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn()
+    },
+    $connect: vi.fn(),
+    $disconnect: vi.fn()
+  }
+}));
+
+// Now import the mocked modules
+import { createContext } from '../lib/context';
+import { auth } from '../lib/firebase-admin';
+import prisma from '../sdks/prisma';
+
+// Get typed references to mock functions
+const mockAuthVerifyIdToken = auth.verifyIdToken as ReturnType<typeof vi.fn>;
+const mockFindUnique = prisma.user.findUnique as ReturnType<typeof vi.fn>;
+const mockCreate = prisma.user.create as ReturnType<typeof vi.fn>;
+const mockUpdate = prisma.user.update as ReturnType<typeof vi.fn>;
 
 // Create a mock implementation of the Firebase token verification
 mockAuthVerifyIdToken.mockImplementation(async (token) => {
@@ -26,31 +52,21 @@ mockAuthVerifyIdToken.mockImplementation(async (token) => {
   };
 });
 
-// Import the real prisma module 
-import prisma from '../sdks/prisma.js';
-
-// Create mock implementation for prisma.user methods
-prisma.user = {
-  findUnique: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn()
-};
-
 describe('Authentication Context', () => {
   beforeEach(() => {
     // Reset all mocks
-    jest.clearAllMocks();
-    
-    // Reset our specific mocks
-    prisma.user.findUnique.mockReset();
-    prisma.user.create.mockReset();
-    prisma.user.update.mockReset();
+    vi.clearAllMocks();
   });
 
   it('should return null user for requests without auth header', async () => {
     // Setup: Create request without auth header
-    const req = { headers: {}, path: '/some/path' };
-    const res = { clearCookie: jest.fn() };
+    const req = { 
+      headers: {}, 
+      path: '/some/path',
+      cookies: {},
+      method: 'GET'
+    } as unknown as Request;
+    const res = { clearCookie: vi.fn() } as unknown as Response;
 
     // Execute
     const context = await createContext({ req, res });
@@ -66,9 +82,11 @@ describe('Authentication Context', () => {
       headers: {
         authorization: 'Bearer valid_token'
       },
-      path: '/auth.signIn'
-    };
-    const res = { clearCookie: jest.fn() };
+      path: '/auth.signIn',
+      cookies: {},
+      method: 'GET'
+    } as unknown as Request;
+    const res = { clearCookie: vi.fn() } as unknown as Response;
 
     // Execute
     const context = await createContext({ req, res });
@@ -93,17 +111,19 @@ describe('Authentication Context', () => {
     
     // Mock Prisma to return null for findUnique (user not found)
     // Then mock create to return our new user
-    prisma.user.findUnique.mockResolvedValue(null);
-    prisma.user.create.mockResolvedValue(newUser);
+    mockFindUnique.mockResolvedValue(null);
+    mockCreate.mockResolvedValue(newUser);
 
     // Create request with auth header
     const req = {
       headers: {
         authorization: 'Bearer valid_token'
       },
-      path: '/some/path'
-    };
-    const res = { clearCookie: jest.fn() };
+      path: '/some/path',
+      cookies: {},
+      method: 'GET'
+    } as unknown as Request;
+    const res = { clearCookie: vi.fn() } as unknown as Response;
 
     // Execute
     console.log('Before createContext call');
@@ -147,7 +167,7 @@ describe('Authentication Context', () => {
     };
 
     // Mock Prisma to handle our update scenario
-    prisma.user.findUnique.mockImplementation((args) => {
+    mockFindUnique.mockImplementation((args: any) => {
       // First call finds the user by firebaseUid, second call returns the updated user
       const isFirstCall = args && args.where && args.where.firebaseUid === 'test-uid';
       if (isFirstCall) {
@@ -157,15 +177,17 @@ describe('Authentication Context', () => {
       return Promise.resolve(updatedUser);
     });
     
-    prisma.user.update.mockResolvedValue(updatedUser);
+    mockUpdate.mockResolvedValue(updatedUser);
 
     const req = {
       headers: {
         authorization: 'Bearer valid_token'
       },
-      path: '/some/path'
-    };
-    const res = { clearCookie: jest.fn() };
+      path: '/some/path',
+      cookies: {},
+      method: 'GET'
+    } as unknown as Request;
+    const res = { clearCookie: vi.fn() } as unknown as Response;
 
     // Execute
     console.log('Before createContext call');
@@ -193,9 +215,11 @@ describe('Authentication Context', () => {
       headers: {
         authorization: 'Bearer invalid_token'
       },
-      path: '/some/path'
-    };
-    const res = { clearCookie: jest.fn() };
+      path: '/some/path',
+      cookies: {},
+      method: 'GET'
+    } as unknown as Request;
+    const res = { clearCookie: vi.fn() } as unknown as Response;
 
     // Execute
     console.log('Before createContext call');

@@ -1,4 +1,4 @@
-import { jest, describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 
 // Define types for our context and handlers
 type MockContext = {
@@ -32,6 +32,8 @@ const mockUser = {
  * These tests directly validate the logic that would be used in the auth router handlers.
  * Since the handlers are very simple, we don't need to import the actual router
  * which avoids any module resolution issues.
+ * 
+ * Migrated from Jest to Vitest
  */
 describe('Auth Router Handlers', () => {
   describe('getUser handler', () => {

@@ -1,16 +1,13 @@
 /**
  * Tests for the ActivityRepository implementation
  */
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ActivityRepositoryImpl } from '../../repositories/activity.repository';
 import { PrismaClient } from '@prisma/client';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
-
-// Mock the PrismaClient
-type MockPrismaClient = DeepMockProxy<PrismaClient>;
+import { mockPrisma } from '../utils/mock-utils';
 
 describe('ActivityRepository', () => {
-  let prisma: MockPrismaClient;
+  let prisma: any;
   let activityRepository: ActivityRepositoryImpl;
   
   // Sample activity data for testing
@@ -26,8 +23,8 @@ describe('ActivityRepository', () => {
 
   beforeEach(() => {
     // Create a fresh mock for each test
-    prisma = mockDeep<PrismaClient>();
-    activityRepository = new ActivityRepositoryImpl(prisma as any);
+    prisma = mockPrisma();
+    activityRepository = new ActivityRepositoryImpl(prisma);
   });
 
   describe('findById', () => {

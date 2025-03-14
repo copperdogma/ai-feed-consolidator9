@@ -1,16 +1,13 @@
 /**
  * Tests for the ContentRepository implementation
  */
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ContentRepositoryImpl } from '../../repositories/content.repository';
 import { PrismaClient } from '@prisma/client';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
-
-// Mock the PrismaClient
-type MockPrismaClient = DeepMockProxy<PrismaClient>;
+import { mockPrisma } from '../utils/mock-utils';
 
 describe('ContentRepository', () => {
-  let prisma: MockPrismaClient;
+  let prisma: any;
   let contentRepository: ContentRepositoryImpl;
   
   // Sample content data for testing - only using the fields we need for testing
@@ -33,8 +30,8 @@ describe('ContentRepository', () => {
 
   beforeEach(() => {
     // Create a fresh mock for each test
-    prisma = mockDeep<PrismaClient>();
-    contentRepository = new ContentRepositoryImpl(prisma as any);
+    prisma = mockPrisma();
+    contentRepository = new ContentRepositoryImpl(prisma);
   });
 
   describe('findById', () => {
@@ -323,7 +320,7 @@ describe('ContentRepository', () => {
   describe('withTransaction', () => {
     it('should return a new repository instance with transaction client', () => {
       // Setup: Create a mock transaction client
-      const mockTx = mockDeep<PrismaClient>();
+      const mockTx = mockPrisma();
       
       // Execute the method under test
       const txRepository = contentRepository.withTransaction(mockTx);

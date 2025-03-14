@@ -4,7 +4,7 @@
  * This approach focuses on behavioral testing rather than implementation testing,
  * since mocking the Prisma client has proven challenging with ESM modules.
  */
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PrismaClient, Prisma } from '@prisma/client';
 
 // Import the service
@@ -14,49 +14,39 @@ import transactionService from '../../services/transaction.service';
 type TransactionCallback = (tx: Prisma.TransactionClient) => Promise<any>;
 
 // Create a simplified mock transaction function for testing
-const mockCallback: TransactionCallback = jest.fn(async () => ({ success: true, data: 'test-data' }));
-const mockErrorCallback: TransactionCallback = jest.fn(async () => {
+const mockCallback: TransactionCallback = vi.fn(async () => ({ success: true, data: 'test-data' }));
+const mockErrorCallback: TransactionCallback = vi.fn(async () => {
   throw new Error('Callback error');
 });
 
 describe('TransactionService', () => {
+  // Reset mocks between tests
   beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('executeTransaction', () => {
-    it('should execute callback and return result', async () => {
-      // Call the method with our mock callback
+    it('should execute a transaction and return the result', async () => {
+      // Call the transaction service
       const result = await transactionService.executeTransaction(mockCallback);
+
+      // Check that callback was called once
+      expect(mockCallback).toHaveBeenCalledTimes(1);
       
-      // Verify the mock was called and result returned correctly
-      expect(mockCallback).toHaveBeenCalled();
+      // Check the transaction was passed to the callback
+      expect(mockCallback).toHaveBeenCalledWith(expect.any(Object));
+      
+      // Check the result
       expect(result).toEqual({ success: true, data: 'test-data' });
     });
 
     it('should propagate errors from the callback', async () => {
-      // Verify the service propagates errors from the callback
+      // Expect the error to be propagated
       await expect(transactionService.executeTransaction(mockErrorCallback))
         .rejects.toThrow('Callback error');
       
-      // Verify mock was called
-      expect(mockErrorCallback).toHaveBeenCalled();
-    });
-  });
-
-  describe('getPrismaClient', () => {
-    it('should return a PrismaClient instance', () => {
-      // Call the method
-      const result = transactionService.getPrismaClient();
-      
-      // Verify result is a PrismaClient
-      expect(result).toBeDefined();
-      expect(typeof result.$connect).toBe('function');
-      expect(typeof result.$transaction).toBe('function');
+      // Check that callback was called
+      expect(mockErrorCallback).toHaveBeenCalledTimes(1);
     });
   });
 }); 

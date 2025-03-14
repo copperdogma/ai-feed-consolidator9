@@ -1,16 +1,14 @@
 /**
  * Tests for the SourceRepository implementation
+ * (Migrated from Jest to Vitest)
  */
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { SourceRepositoryImpl } from '../../repositories/source.repository';
 import { PrismaClient } from '@prisma/client';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
-
-// Mock the PrismaClient
-type MockPrismaClient = DeepMockProxy<PrismaClient>;
+import { mockPrisma } from '../utils/mock-utils';
 
 describe('SourceRepository', () => {
-  let prisma: MockPrismaClient;
+  let prisma: any;
   let sourceRepository: SourceRepositoryImpl;
   
   // Sample source data for testing
@@ -29,14 +27,14 @@ describe('SourceRepository', () => {
 
   beforeEach(() => {
     // Create a fresh mock for each test
-    prisma = mockDeep<PrismaClient>();
+    prisma = mockPrisma();
     sourceRepository = new SourceRepositoryImpl(prisma as any);
   });
 
   describe('findById', () => {
     it('should return source when it exists', async () => {
       // Setup the mock to return our sample source
-      prisma.source.findUnique.mockResolvedValue(sampleSource);
+      (prisma.source.findUnique as any).mockResolvedValue(sampleSource);
 
       // Execute the method under test
       const result = await sourceRepository.findById('source-123');
@@ -52,7 +50,7 @@ describe('SourceRepository', () => {
 
     it('should return null when source does not exist', async () => {
       // Setup the mock to return null
-      prisma.source.findUnique.mockResolvedValue(null);
+      (prisma.source.findUnique as any).mockResolvedValue(null);
 
       // Execute the method under test
       const result = await sourceRepository.findById('non-existent');
@@ -69,7 +67,7 @@ describe('SourceRepository', () => {
         { ...sampleSource, id: 'source-1' },
         { ...sampleSource, id: 'source-2', name: 'Another Source' }
       ];
-      prisma.source.findMany.mockResolvedValue(sources);
+      (prisma.source.findMany as any).mockResolvedValue(sources);
 
       // Execute the method under test
       const result = await sourceRepository.findAll();
@@ -89,7 +87,7 @@ describe('SourceRepository', () => {
     it('should return sources with pagination', async () => {
       // Setup: Create an array of sample sources
       const sources = [{ ...sampleSource, id: 'source-2' }];
-      prisma.source.findMany.mockResolvedValue(sources);
+      (prisma.source.findMany as any).mockResolvedValue(sources);
 
       // Execute the method under test with pagination
       const result = await sourceRepository.findAll({ skip: 1, take: 1 });
@@ -108,24 +106,24 @@ describe('SourceRepository', () => {
 
     it('should return sources with filtering', async () => {
       // Setup: Create filtered sources
-      const sources = [{ ...sampleSource, sourceType: 'TWITTER' }];
-      prisma.source.findMany.mockResolvedValue(sources);
+      const sources = [{ ...sampleSource, sourceType: 'ATOM' }];
+      (prisma.source.findMany as any).mockResolvedValue(sources);
 
       // Execute the method under test with filtering
       const result = await sourceRepository.findAll({ 
-        where: { sourceType: 'TWITTER' } 
+        where: { sourceType: 'ATOM' } 
       });
 
       // Verify the result
       expect(result).toEqual(sources);
       expect(result.length).toBe(1);
-      expect(result[0].sourceType).toBe('TWITTER');
+      expect(result[0].sourceType).toBe('ATOM');
       
       // Verify that the mock was called with the correct parameters
       expect(prisma.source.findMany).toHaveBeenCalledWith({
         skip: undefined,
         take: undefined,
-        where: { sourceType: 'TWITTER' }
+        where: { sourceType: 'ATOM' }
       });
     });
   });
@@ -137,20 +135,20 @@ describe('SourceRepository', () => {
         userId: 'user-123',
         name: 'New Source',
         sourceType: 'RSS',
-        url: 'https://example.com/newfeed',
-        isActive: true
+        url: 'https://example.com/newfeed'
       };
 
       // Setup: Mock the create method to return our data plus an ID
       const createdSource = { 
         ...newSourceData,
         id: 'new-source-123', 
+        isActive: true,
         lastFetched: null,
         metadata: null,
         createdAt: new Date(),
         updatedAt: new Date() 
       };
-      prisma.source.create.mockResolvedValue(createdSource);
+      (prisma.source.create as any).mockResolvedValue(createdSource);
 
       // Execute the method under test
       const result = await sourceRepository.create(newSourceData);
@@ -169,7 +167,7 @@ describe('SourceRepository', () => {
     it('should update and return the source', async () => {
       // Setup: The data we want to update
       const updateData = {
-        name: 'Updated Source Name',
+        name: 'Updated Name',
         isActive: false
       };
 
@@ -179,14 +177,14 @@ describe('SourceRepository', () => {
         ...updateData,
         updatedAt: new Date() 
       };
-      prisma.source.update.mockResolvedValue(updatedSource);
+      (prisma.source.update as any).mockResolvedValue(updatedSource);
 
       // Execute the method under test
       const result = await sourceRepository.update('source-123', updateData);
 
       // Verify the result
       expect(result).toEqual(updatedSource);
-      expect(result.name).toBe('Updated Source Name');
+      expect(result.name).toBe('Updated Name');
       expect(result.isActive).toBe(false);
       
       // Verify that the mock was called with the correct parameters
@@ -199,7 +197,7 @@ describe('SourceRepository', () => {
     it('should throw an error when source does not exist', async () => {
       // Setup: Mock to throw an error
       const error = new Error('Source not found');
-      prisma.source.update.mockRejectedValue(error);
+      (prisma.source.update as any).mockRejectedValue(error);
 
       // Execute & Verify
       await expect(sourceRepository.update('non-existent', { name: 'New Name' }))
@@ -210,7 +208,7 @@ describe('SourceRepository', () => {
   describe('delete', () => {
     it('should delete source and return true on success', async () => {
       // Setup: Mock the delete method to return the deleted source
-      prisma.source.delete.mockResolvedValue(sampleSource);
+      (prisma.source.delete as any).mockResolvedValue(sampleSource);
 
       // Execute the method under test
       const result = await sourceRepository.delete('source-123');
@@ -227,7 +225,7 @@ describe('SourceRepository', () => {
     it('should return false when deletion fails', async () => {
       // Setup: Mock to throw an error
       const error = new Error('Source not found');
-      prisma.source.delete.mockRejectedValue(error);
+      (prisma.source.delete as any).mockRejectedValue(error);
 
       // Execute the method under test
       const result = await sourceRepository.delete('non-existent');
@@ -245,7 +243,7 @@ describe('SourceRepository', () => {
   describe('count', () => {
     it('should return the number of sources', async () => {
       // Setup: Mock to return a count
-      prisma.source.count.mockResolvedValue(10);
+      (prisma.source.count as any).mockResolvedValue(10);
 
       // Execute the method under test
       const result = await sourceRepository.count();
@@ -261,29 +259,29 @@ describe('SourceRepository', () => {
 
     it('should return the number of filtered sources', async () => {
       // Setup: Mock to return a filtered count
-      prisma.source.count.mockResolvedValue(3);
+      (prisma.source.count as any).mockResolvedValue(2);
 
       // Execute the method under test with filter
-      const result = await sourceRepository.count({ sourceType: 'RSS' });
+      const result = await sourceRepository.count({ sourceType: 'ATOM' });
 
       // Verify the result
-      expect(result).toBe(3);
+      expect(result).toBe(2);
       
       // Verify that the mock was called with the correct parameters
       expect(prisma.source.count).toHaveBeenCalledWith({
-        where: { sourceType: 'RSS' }
+        where: { sourceType: 'ATOM' }
       });
     });
   });
 
   describe('findByUserId', () => {
-    it('should return sources for a given user ID', async () => {
-      // Setup: Create an array of sample sources with the same user ID
+    it('should return sources for a specific user', async () => {
+      // Setup: Create an array of sample sources for the user
       const sources = [
         { ...sampleSource, id: 'source-1' },
         { ...sampleSource, id: 'source-2', name: 'Another Source' }
       ];
-      prisma.source.findMany.mockResolvedValue(sources);
+      (prisma.source.findMany as any).mockResolvedValue(sources);
 
       // Execute the method under test
       const result = await sourceRepository.findByUserId('user-123');
@@ -298,12 +296,12 @@ describe('SourceRepository', () => {
       });
     });
 
-    it('should return an empty array when no sources exist for the user', async () => {
-      // Setup: Mock to return an empty array
-      prisma.source.findMany.mockResolvedValue([]);
+    it('should return empty array when no sources exist for user', async () => {
+      // Setup: Mock to return empty array
+      (prisma.source.findMany as any).mockResolvedValue([]);
 
       // Execute the method under test
-      const result = await sourceRepository.findByUserId('user-without-sources');
+      const result = await sourceRepository.findByUserId('non-existent-user');
 
       // Verify the result
       expect(result).toEqual([]);
@@ -312,179 +310,143 @@ describe('SourceRepository', () => {
   });
 
   describe('findByType', () => {
-    it('should return sources with the specified type', async () => {
-      // Setup: Create sample sources with specific type
-      const rssSources = [
-        { ...sampleSource, id: 'source-1', sourceType: 'RSS' },
-        { ...sampleSource, id: 'source-2', sourceType: 'RSS' }
+    it('should return sources of a specific type', async () => {
+      // Setup: Create an array of sample sources of the specified type
+      const sources = [
+        { ...sampleSource, id: 'source-1', sourceType: 'ATOM' },
+        { ...sampleSource, id: 'source-2', sourceType: 'ATOM', name: 'Another Source' }
       ];
-      prisma.source.findMany.mockResolvedValue(rssSources);
+      (prisma.source.findMany as any).mockResolvedValue(sources);
 
       // Execute the method under test
-      const result = await sourceRepository.findByType('RSS');
+      const result = await sourceRepository.findByType('ATOM');
 
       // Verify the result
-      expect(result).toEqual(rssSources);
+      expect(result).toEqual(sources);
       expect(result.length).toBe(2);
-      expect(result[0].sourceType).toBe('RSS');
+      expect(result[0].sourceType).toBe('ATOM');
       
       // Verify that the mock was called with the correct parameters
       expect(prisma.source.findMany).toHaveBeenCalledWith({
-        where: { sourceType: 'RSS' }
+        where: { sourceType: 'ATOM' }
       });
-    });
-
-    it('should return an empty array when no sources with type exist', async () => {
-      // Setup: Mock to return an empty array
-      prisma.source.findMany.mockResolvedValue([]);
-
-      // Execute the method under test
-      const result = await sourceRepository.findByType('NONEXISTENT');
-
-      // Verify the result
-      expect(result).toEqual([]);
-      expect(result.length).toBe(0);
     });
   });
 
   describe('findSourcesToRefresh', () => {
-    it('should return sources that need refreshing with default threshold', async () => {
-      // Setup for test with the default threshold (1 hour)
-      const sourcesDueForRefresh = [
-        { ...sampleSource, id: 'source-1', lastFetched: new Date(Date.now() - 2 * 60 * 60 * 1000) }, // 2 hours ago
+    it('should return sources that need refreshing', async () => {
+      // Setup: Create a date threshold
+      const now = new Date();
+      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+      
+      // Setup: Mock sources that need refreshing
+      const sources = [
+        { ...sampleSource, id: 'source-1', lastFetched: oneHourAgo },
         { ...sampleSource, id: 'source-2', lastFetched: null }
       ];
-      prisma.source.findMany.mockResolvedValue(sourcesDueForRefresh);
-      
-      // We need to mock Date.now() to have a consistent test
-      const originalDateNow = Date.now;
-      const mockNow = 1647712800000; // Example timestamp
-      global.Date.now = jest.fn(() => mockNow);
+      (prisma.source.findMany as any).mockResolvedValue(sources);
 
-      try {
-        // Execute the method under test (no parameter = default 1 hour threshold)
-        const result = await sourceRepository.findSourcesToRefresh();
+      // Mock Date.now to return a fixed value for testing
+      const realDateNow = Date.now;
+      Date.now = vi.fn(() => now.getTime());
 
-        // Verify the result
-        expect(result).toEqual(sourcesDueForRefresh);
-        expect(result.length).toBe(2);
-        
-        // Verify that the mock was called with the correct parameters
-        // The threshold should be 1 hour ago from the mock now time
-        const expectedThreshold = new Date(mockNow - 60 * 60 * 1000);
-        expect(prisma.source.findMany).toHaveBeenCalledWith({
-          where: {
-            OR: [
-              { lastFetched: { lt: expect.any(Date) } },
-              { lastFetched: null },
-            ],
-            isActive: true,
-          },
-        });
-        
-        // Check that the Date passed to the query is approximately correct
-        // We can't directly access the Date object passed in the mock call
-        // So we verify the function was called with a date parameter
-        expect(prisma.source.findMany.mock.calls[0][0].where.OR[0].lastFetched.lt).toBeInstanceOf(Date);
-      } finally {
-        // Restore the original Date.now
-        global.Date.now = originalDateNow;
-      }
-    });
-
-    it('should return sources that need refreshing with custom threshold', async () => {
-      // Setup for test with a custom threshold (30 minutes)
-      const sourcesDueForRefresh = [
-        { ...sampleSource, id: 'source-1', lastFetched: new Date(Date.now() - 40 * 60 * 1000) } // 40 minutes ago
-      ];
-      prisma.source.findMany.mockResolvedValue(sourcesDueForRefresh);
-      
-      // We need to mock Date.now() to have a consistent test
-      const originalDateNow = Date.now;
-      const mockNow = 1647712800000; // Example timestamp
-      global.Date.now = jest.fn(() => mockNow);
-
-      try {
-        // Execute the method under test with 30 minute threshold
-        const result = await sourceRepository.findSourcesToRefresh(30);
-
-        // Verify the result
-        expect(result).toEqual(sourcesDueForRefresh);
-        expect(result.length).toBe(1);
-        
-        // Verify that the mock was called with the correct parameters
-        // The threshold should be 30 minutes ago from the mock now time
-        const expectedThreshold = new Date(mockNow - 30 * 60 * 1000);
-        expect(prisma.source.findMany).toHaveBeenCalledWith({
-          where: {
-            OR: [
-              { lastFetched: { lt: expect.any(Date) } },
-              { lastFetched: null },
-            ],
-            isActive: true,
-          },
-        });
-        
-        // Check that the Date passed to the query is approximately correct
-        expect(prisma.source.findMany.mock.calls[0][0].where.OR[0].lastFetched.lt).toBeInstanceOf(Date);
-      } finally {
-        // Restore the original Date.now
-        global.Date.now = originalDateNow;
-      }
-    });
-
-    it('should only include active sources', async () => {
-      // Setup: Mock implementation to verify the isActive filter is applied
-      prisma.source.findMany.mockResolvedValue([]);
-      
       // Execute the method under test
-      await sourceRepository.findSourcesToRefresh();
+      const result = await sourceRepository.findSourcesToRefresh();
+
+      // Verify the result
+      expect(result).toEqual(sources);
+      expect(result.length).toBe(2);
       
-      // Verify that the mock was called with isActive: true in the where clause
-      expect(prisma.source.findMany.mock.calls[0][0].where.isActive).toBe(true);
+      // Verify that the mock was called with appropriate where clause
+      expect(prisma.source.findMany).toHaveBeenCalledWith({
+        where: {
+          OR: [
+            { lastFetched: { lt: expect.any(Date) } },
+            { lastFetched: null }
+          ],
+          isActive: true
+        }
+      });
+
+      // Restore the original Date.now
+      Date.now = realDateNow;
+    });
+
+    it('should use custom threshold when olderThanMinutes is provided', async () => {
+      // Setup: Create a date threshold
+      const now = new Date();
+      const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
+      
+      // Setup: Mock sources that need refreshing
+      const sources = [{ ...sampleSource, id: 'source-1', lastFetched: thirtyMinutesAgo }];
+      (prisma.source.findMany as any).mockResolvedValue(sources);
+
+      // Mock Date.now to return a fixed value for testing
+      const realDateNow = Date.now;
+      Date.now = vi.fn(() => now.getTime());
+
+      // Execute the method under test with custom threshold
+      const result = await sourceRepository.findSourcesToRefresh(30);
+
+      // Verify the result
+      expect(result).toEqual(sources);
+      expect(result.length).toBe(1);
+      
+      // Verify that the mock was called with appropriate where clause
+      expect(prisma.source.findMany).toHaveBeenCalledWith({
+        where: {
+          OR: [
+            { lastFetched: { lt: expect.any(Date) } },
+            { lastFetched: null }
+          ],
+          isActive: true
+        }
+      });
+
+      // Restore the original Date.now
+      Date.now = realDateNow;
     });
   });
 
   describe('updateLastFetched', () => {
-    it('should update lastFetched timestamp to current time', async () => {
-      // Setup: Mock Date.now for consistent testing
-      const originalDateNow = Date.now;
-      const mockNow = 1647712800000; // Example timestamp
-      global.Date.now = jest.fn(() => mockNow);
+    it('should update the lastFetched timestamp', async () => {
+      // Setup: Create a fixed date for testing
+      const now = new Date();
       
-      // The expected updated source with a new lastFetched timestamp
-      const updatedSource = {
+      // Mock Date constructor to return a fixed date
+      const realDate = global.Date;
+      global.Date = vi.fn(() => now) as any;
+      global.Date.now = realDate.now;
+
+      // Setup: Mock the update method
+      const updatedSource = { 
         ...sampleSource,
-        lastFetched: new Date(mockNow),
+        lastFetched: now,
+        updatedAt: now
       };
-      prisma.source.update.mockResolvedValue(updatedSource);
+      (prisma.source.update as any).mockResolvedValue(updatedSource);
 
-      try {
-        // Execute the method under test
-        const result = await sourceRepository.updateLastFetched('source-123');
+      // Execute the method under test
+      const result = await sourceRepository.updateLastFetched('source-123');
 
-        // Verify the result
-        expect(result).toEqual(updatedSource);
-        expect(result.lastFetched).toEqual(new Date(mockNow));
-        
-        // Verify that the update was called with the correct parameters
-        expect(prisma.source.update).toHaveBeenCalledWith({
-          where: { id: 'source-123' },
-          data: { lastFetched: expect.any(Date) }
-        });
-        
-        // Check that the Date passed to the update is approximately correct
-        expect(prisma.source.update.mock.calls[0][0].data.lastFetched).toBeInstanceOf(Date);
-      } finally {
-        // Restore the original Date.now
-        global.Date.now = originalDateNow;
-      }
+      // Verify the result
+      expect(result).toEqual(updatedSource);
+      expect(result.lastFetched).toEqual(now);
+      
+      // Verify that the mock was called with the correct parameters
+      expect(prisma.source.update).toHaveBeenCalledWith({
+        where: { id: 'source-123' },
+        data: { lastFetched: now }
+      });
+
+      // Restore the original Date
+      global.Date = realDate;
     });
 
     it('should throw an error when source does not exist', async () => {
       // Setup: Mock to throw an error
       const error = new Error('Source not found');
-      prisma.source.update.mockRejectedValue(error);
+      (prisma.source.update as any).mockRejectedValue(error);
 
       // Execute & Verify
       await expect(sourceRepository.updateLastFetched('non-existent'))

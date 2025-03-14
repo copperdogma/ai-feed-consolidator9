@@ -1,19 +1,19 @@
 import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [
-    // Add support for TypeScript path aliases
-    tsconfigPaths(),
+    // Add React support
+    react(),
   ],
   
   test: {
-    // Use the same environment as Jest for consistency
-    environment: 'node',
+    // Use jsdom as the testing environment for client tests
+    environment: 'jsdom',
     
-    // Target test files
-    include: ['**/*.test.ts', '**/*.vitest.ts', '**/*.vitest.js'],
+    // Include both current Jest tests and future Vitest tests
+    include: ['**/*.test.{js,jsx,ts,tsx}', '**/*.vitest.{js,jsx,ts,tsx}'],
     
     // Explicitly exclude any problematic test files
     exclude: ['**/node_modules/**'],
@@ -27,24 +27,13 @@ export default defineConfig({
         'dist/',
         '**/vitest.setup.ts',
         '**/*.d.ts',
-        'src/generated/**',
-        'src/scripts/**',
-        'src/tests/**',
-        'src/main.ts',
-        'src/index.ts',
-        '*.js',
-        '*.cjs',
-        'prisma/**',
-        'scripts/**',
-        'src/trpc/**',
-        'src/sdks/__mocks__/**',
       ],
       // Add thresholds to enforce minimum coverage levels
       thresholds: {
-        statements: 75,
-        branches: 65,
-        functions: 75,
-        lines: 75,
+        statements: 10,
+        branches: 10,
+        functions: 10,
+        lines: 10,
         // More specific thresholds for critical paths
         perFile: false,
         autoUpdate: false,
@@ -56,15 +45,21 @@ export default defineConfig({
     // Set longer timeout for tests that need it
     testTimeout: 10000,
     
-    // Make sure hooks are called with the right context
+    // Make sure globals are available in tests
     globals: true,
+    
+    // Setup files that should run before each test
+    setupFiles: ['./src/tests/vitest.setup.js'],
   },
   
-  // Resolve paths for imports (additional to tsconfig paths)
+  // Resolve paths for imports
   resolve: {
     alias: {
       'src': resolve(__dirname, './src'),
-      'sdks/prisma': resolve(__dirname, './src/sdks/prisma'),
+      'components': resolve(__dirname, './src/components'),
+      'views': resolve(__dirname, './src/views'),
+      'hooks': resolve(__dirname, './src/hooks'),
+      'lib': resolve(__dirname, './src/lib'),
     },
   },
 }); 

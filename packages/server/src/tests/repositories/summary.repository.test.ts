@@ -1,16 +1,15 @@
 /**
  * Tests for the SummaryRepository implementation
  */
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { SummaryRepositoryImpl } from '../../repositories/summary.repository';
 import { PrismaClient } from '@prisma/client';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+import { mockPrisma } from '../utils/mock-utils';
 
 // Mock the PrismaClient
-type MockPrismaClient = DeepMockProxy<PrismaClient>;
 
 describe('SummaryRepository', () => {
-  let prisma: MockPrismaClient;
+  let prisma: any;
   let summaryRepository: SummaryRepositoryImpl;
   
   // Sample summary data for testing
@@ -25,7 +24,7 @@ describe('SummaryRepository', () => {
 
   beforeEach(() => {
     // Create a fresh mock for each test
-    prisma = mockDeep<PrismaClient>();
+    prisma = mockPrisma();
     summaryRepository = new SummaryRepositoryImpl(prisma as any);
   });
 

@@ -1,7 +1,8 @@
 /**
  * Tests for the RepositoryFactory
+ * (Migrated from Jest to Vitest)
  */
-import { describe, it, expect, jest, beforeEach, afterAll } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 
 // Import the factory and repositories directly
@@ -23,7 +24,7 @@ describe('RepositoryFactory', () => {
   
   // Clean up the static instances between tests and restore the original transaction
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     
     // Reset static instances
     (RepositoryFactory as any).userRepository = undefined;
@@ -35,7 +36,7 @@ describe('RepositoryFactory', () => {
     (RepositoryFactory as any).contentTopicRepository = undefined;
     
     // Mock transaction for each test
-    prisma.$transaction = jest.fn();
+    prisma.$transaction = vi.fn();
   });
   
   // Restore original transaction after tests
@@ -146,12 +147,12 @@ describe('RepositoryFactory', () => {
   describe('Transaction Execution', () => {
     it('should execute a transaction with transaction-specific repositories', async () => {
       // Mock the transaction implementation
-      (prisma.$transaction as jest.Mock).mockImplementation(async (cb: any) => {
+      (prisma.$transaction as any).mockImplementation(async (cb: any) => {
         return cb(prisma);
       });
 
       // Mock callback for the transaction
-      const mockCallback = jest.fn().mockResolvedValue({ success: true });
+      const mockCallback = vi.fn().mockResolvedValue({ success: true });
 
       // Execute the transaction
       const result = await RepositoryFactory.executeTransaction(mockCallback);
@@ -174,7 +175,7 @@ describe('RepositoryFactory', () => {
 
     it('should propagate errors from the transaction', async () => {
       // Mock the transaction implementation
-      (prisma.$transaction as jest.Mock).mockImplementation(async (cb: any) => {
+      (prisma.$transaction as any).mockImplementation(async (cb: any) => {
         return cb(prisma);
       });
       
@@ -182,7 +183,7 @@ describe('RepositoryFactory', () => {
       const mockError = new Error('Transaction error');
       
       // Mock the callback to throw an error
-      const mockCallback = jest.fn().mockImplementation(() => {
+      const mockCallback = vi.fn().mockImplementation(() => {
         throw mockError;
       });
       
@@ -199,10 +200,10 @@ describe('RepositoryFactory', () => {
       const mockError = new Error('Prisma error');
       
       // Mock transaction to throw an error
-      (prisma.$transaction as jest.Mock).mockRejectedValue(mockError);
+      (prisma.$transaction as any).mockRejectedValue(mockError);
       
       // Mock the callback (which won't be executed)
-      const mockCallback = jest.fn();
+      const mockCallback = vi.fn();
       
       // Execute & Verify: Error should be propagated
       await expect(RepositoryFactory.executeTransaction(mockCallback))

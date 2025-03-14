@@ -1,20 +1,20 @@
 /**
  * Mock implementation of the Prisma client for testing
- * This follows the standard Jest mocking pattern with __mocks__ directory
+ * This follows the standard Vitest mocking pattern
  */
-import { PrismaClient, Prisma } from '@prisma/client';
-import { mockDeep, mockReset, DeepMockProxy } from 'jest-mock-extended';
-import { beforeEach } from '@jest/globals';
+import { PrismaClient } from '@prisma/client';
+import { mockDeep } from '../../tests/utils/mock-utils';
+import { beforeEach, vi } from 'vitest';
 
 // Create a mockDeep instance of PrismaClient
 export const prismaMock = mockDeep<PrismaClient>();
 
 // Reset all mocks between tests
 beforeEach(() => {
-  mockReset(prismaMock);
+  vi.clearAllMocks();
   
   // We need to explicitly mock the $transaction method for our tests
-  prismaMock.$transaction.mockImplementation(async (callback: any) => {
+  (prismaMock.$transaction as any).mockImplementation(async (callback: any) => {
     if (typeof callback === 'function') {
       return callback(prismaMock);
     }

@@ -60,6 +60,12 @@ export class RssFeedService {
       let response;
       try {
         response = await fetch(url);
+        if (!response) {
+          return {
+            success: false,
+            error: 'Invalid URL format or network error'
+          };
+        }
       } catch (error: any) {
         return {
           success: false,
@@ -250,7 +256,16 @@ export class RssFeedService {
       }
 
       // Fetch the feed
-      const response = await fetch(url);
+      let response;
+      try {
+        response = await fetch(url);
+        if (!response) {
+          return { isValid: false, error: 'Network error or invalid URL' };
+        }
+      } catch (error) {
+        return { isValid: false, error: `Network error: ${(error as Error).message}` };
+      }
+      
       if (!response.ok) {
         return { isValid: false, error: `HTTP error: ${response.status}` };
       }

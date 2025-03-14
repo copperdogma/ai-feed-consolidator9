@@ -71,6 +71,11 @@ describe('RssFeedService', () => {
     });
 
     it('should return false for invalid URLs', async () => {
+      // Mock fetch to throw for invalid URLs
+      global.fetch = vi.fn().mockImplementation((url: string) => {
+        throw new Error('Invalid URL format');
+      });
+      
       const result = await rssFeedService.validateFeedUrl('not-a-url');
       expect(result.isValid).toBe(false);
       expect(result.error).toBeDefined();

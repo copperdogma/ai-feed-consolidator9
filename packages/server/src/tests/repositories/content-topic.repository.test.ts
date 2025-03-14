@@ -1,16 +1,13 @@
 /**
  * Tests for the ContentTopicRepository implementation
  */
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ContentTopicRepositoryImpl } from '../../repositories/content-topic.repository';
 import { PrismaClient } from '@prisma/client';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
-
-// Mock the PrismaClient
-type MockPrismaClient = DeepMockProxy<PrismaClient>;
+import { mockPrisma } from '../utils/mock-utils';
 
 describe('ContentTopicRepository', () => {
-  let prisma: MockPrismaClient;
+  let prisma: any;
   let contentTopicRepository: ContentTopicRepositoryImpl;
   
   // Sample content-topic relation data for testing
@@ -23,8 +20,8 @@ describe('ContentTopicRepository', () => {
 
   beforeEach(() => {
     // Create a fresh mock for each test
-    prisma = mockDeep<PrismaClient>();
-    contentTopicRepository = new ContentTopicRepositoryImpl(prisma as any);
+    prisma = mockPrisma();
+    contentTopicRepository = new ContentTopicRepositoryImpl(prisma);
   });
 
   describe('findByContentId', () => {

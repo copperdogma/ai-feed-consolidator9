@@ -1,26 +1,23 @@
 /**
  * Type declaration file for Vitest
- * This is needed because we're using both Jest and Vitest in the project,
- * and we need to make TypeScript aware of Vitest's types.
+ * This ensures TypeScript is aware of Vitest's types.
  */
 
 declare module 'vitest' {
-  import { expect as jestExpect } from '@jest/globals';
-  
-  // Re-export types from Jest that Vitest uses
-  export const describe: typeof global.describe;
-  export const it: typeof global.it;
-  export const test: typeof global.test;
-  export const expect: typeof jestExpect;
-  export const beforeEach: typeof global.beforeEach;
-  export const afterEach: typeof global.afterEach;
-  export const beforeAll: typeof global.beforeAll;
-  export const afterAll: typeof global.afterAll;
+  // Vitest global types
+  export const describe: Function;
+  export const it: Function;
+  export const test: Function;
+  export const expect: Function;
+  export const beforeEach: Function;
+  export const afterEach: Function;
+  export const beforeAll: Function;
+  export const afterAll: Function;
   
   // Vitest specific functions
   export const vi: {
-    fn: typeof jest.fn;
-    mock: typeof jest.mock;
+    fn: () => any;
+    mock: (path: string, factory?: () => any) => any;
     clearAllMocks: () => void;
     useFakeTimers: () => void;
     useRealTimers: () => void;

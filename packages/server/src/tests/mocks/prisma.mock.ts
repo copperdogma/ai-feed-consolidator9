@@ -3,10 +3,15 @@
  */
 
 import { PrismaClient } from '@prisma/client';
-import { mockDeep, mockReset, DeepMockProxy } from 'jest-mock-extended';
+import { mockDeep } from '../utils/mock-utils';
+import { vi } from 'vitest';
 
-// Create a mock PrismaClient
-export type MockPrismaClient = DeepMockProxy<PrismaClient>;
+// Define a type for our mock Prisma client
+export type MockPrismaClient = {
+  [K in keyof PrismaClient]: PrismaClient[K] extends (...args: any[]) => any
+    ? ReturnType<typeof vi.fn>
+    : MockPrismaClient;
+} & PrismaClient;
 
 // Create a factory function for the mock
 const createPrismaMock = () => {
@@ -18,7 +23,7 @@ export const prismaMock = createPrismaMock();
 
 // Reset all mocks between tests
 export const resetPrismaMocks = () => {
-  mockReset(prismaMock);
+  vi.clearAllMocks();
 };
 
 // Create a simple in-memory user store for tests that need it
